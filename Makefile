@@ -55,20 +55,25 @@ verify: check-spelling
 
 $(OUTPUT): $(SOURCES) toc.input
 	$(call print_target)
-	nroff -ms $(SOURCES) > $@
+	nroff -ms $(SOURCES) | \
+	    sed 's/FORMFEED\(\[Page[ ]*[0-9]*\]\)[ ]*/        \1\
+\
+/' \
+	    > $@
 
 toc.input: $(SOURCES)
 	$(call print_target)
+	touch toc.input
 	# run once to generate a placeholder TOC
 	# which will block correctly, but include
 	# wrong page numbers
-	groff -z $(SOURCES) 2>&1 >/dev/null | \
+	nroff -ms $(SOURCES) 2>&1 >/dev/null | \
 	    sed 's/^_//' | \
 	    grep -v ': warning: ' | \
 	    sed 's/^/   /' | \
 	    tee $@
 	# do it again with correct line numbers
-	groff -z $(SOURCES) 2>&1 >/dev/null | \
+	nroff -ms $(SOURCES) 2>&1 >/dev/null | \
 	    sed 's/^_//' | \
 	    grep -v ': warning: ' | \
 	    sed 's/^/   /' | \
