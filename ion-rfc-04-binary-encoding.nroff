@@ -6,11 +6,13 @@ binary format, a value stream always starts with a binary version marker
 (BVM) that specifies the precise Ion version used to encode the data
 that follows:
 
+.KS
 .nf
                           7    0 7     0 7     0 7    0
                          +------+-------+-------+------+
    binary version marker | 0xE0 | major | minor | 0xEA |
                          +------+-------+-------+------+
+.KE
 
 .in 3
 The four-octet BVM also acts as a "magic cookie" to distinguish Ion
@@ -24,6 +26,7 @@ An Ion value stream starts with a BVM, followed by zero or more values
 which contain the actual data. These values are generally referred to as
 "top-level values".
 
+.KS
 .nf
                  31                      0
                 +-------------------------+
@@ -38,6 +41,7 @@ which contain the actual data. These values are generally referred to as
                 :          value          :
                 +=========================+
                              ⋮
+.KE
 
 .in 3
 A value stream can contain other, perhaps different, BVMs interspersed
@@ -63,6 +67,7 @@ UInt and Int fields represent fixed-length unsigned and signed integer
 values. These field formats are always used in some context that clearly
 indicates the number of octets in the field.
 
+.KS
 .nf
                7                       0
               +-------------------------+
@@ -75,10 +80,12 @@ indicates the number of octets in the field.
               :          bits           :
               +=========================+
                n+7                     n
+.KE
 
 .in 3
 UInts are sequences of octets, interpreted as big-endian.
 
+.KS
 .nf
                 7  6                   0
               +---+---------------------+
@@ -95,6 +102,7 @@ UInts are sequences of octets, interpreted as big-endian.
               :          bits           :
               +=========================+
                n+7                     n
+.KE
 
 .in 3
 Ints are sequences of octets, interpreted as sign-and-magnitude big
@@ -113,6 +121,7 @@ in a context that does not indicate the number of octets in the field;
 the last octet (and only the last octet) has its high-order bit set to
 terminate the field.
 
+.KS
 .nf 
                    7  6                   0      
                  +===+=====================+     
@@ -123,12 +132,14 @@ terminate the field.
                  +---+---------------------+
                  | 1 |         bits        |
                  +---+---------------------+
+.KE
 
-.in 3 
+.in 3
 VarUInts are a sequence of octets. The high-order bit of the last octet
 is one, indicating the end of the sequence. All other high-order bits
 must be zero.
 
+.KS
 .nf
                   7   6  5               0       n+7 n+6                 n
                 +===+                           +---+
@@ -141,6 +152,7 @@ must be zero.
                   |   |                           |
                   |   +--sign                     +--end flag
                   +--end flag
+.KE
 
 .in 3
 VarInts are sign-and-magnitude integers, like Ints. Their layout is
@@ -155,6 +167,7 @@ first octet of the representation, but part of the extension bits for
 all other octets. For single-octet VarInt values, this collapses
 down to:
 
+.KS
 .nf
                                7   6  5           0
                              +---+---+-------------+
@@ -163,7 +176,9 @@ down to:
                                    ^
                                    |
                                    +--sign
+.KE
 
+.in 3
 
 .ti 0
 4.2 Typed Value Formats
@@ -171,6 +186,7 @@ down to:
 A value consists of a one-octet type descriptor, possibly followed by a
 length in octets, possibly followed by a representation.
 
+.KS
 .nf
           7       4 3       0
          +---------+---------+
@@ -180,6 +196,7 @@ length in octets, possibly followed by a representation.
          +==========================+
          :      representation      :
          +==========================+
+.KE
 
 .in 3
 The type descriptor octet has two subfields: a four-bit type code T, and
@@ -216,17 +233,20 @@ VarUInt field.
 .ti 0
 4.2.1 0 Nulls
 
+.KS
 .nf
               7       4 3       0
               +---------+---------+
    Null value |    0    |    15   |
               +---------+---------+
+.KE
 
 .in 3
 Values of type null always have empty lengths and representations. The only valid L value is 15, representing the only value of this type, null.null.
 
 4.2.1.1 NOP Padding
 
+.KS
 .nf
             7       4 3       0
            +---------+---------+
@@ -236,6 +256,7 @@ Values of type null always have empty lengths and representations. The only vali
            +--------------------------+
            |      ignored octets      |
            +--------------------------+
+.KE
 
 .in 3
 In addition to null.null, the null type code is used to encode padding that has no operation (NOP padding). This can be used for “binary whitespace” when alignment of octet boundaries is needed or to support in-place editing. Such encodings are not considered values and are ignored by the processor.
@@ -267,11 +288,13 @@ NOP padding is valid anywhere a value can be encoded, except for within an annot
 .ti 0
 2.1.2 1 Booleans
 
+.KS
 .nf
                7       4 3       0
               +---------+---------+
    Bool value |    1    |   rep   |
               +---------+---------+
+.KE
 
 .in 3
 Values of type bool always have empty lengths, and their representation is stored in the typedesc itself (rather than after the typedesc). A representation of 0 means false; a representation of 1 means true; and a representation of 15 means null.bool.
@@ -281,6 +304,7 @@ Values of type bool always have empty lengths, and their representation is store
 
 Values of type int are stored using two type codes: 2 for positive values and 3 for negative values. Both codes use a UInt subfield to store the magnitude.
 
+.KS
 .nf
               7       4 3       0
              +---------+---------+
@@ -290,6 +314,7 @@ Values of type int are stored using two type codes: 2 for positive values and 3 
              +==========================+
              :     magnitude [UInt]     :
              +==========================+
+.KE
 
 .in 3
 Zero is always stored as positive; negative zero is illegal.
@@ -301,6 +326,7 @@ With either type code 2 or 3, if L is 15, then the value is null.int and the mag
 .ti 0
 2.1.4 4 Floats
 
+.KS
 .nf
                  7       4 3       0
                +---------+---------+
@@ -308,6 +334,7 @@ With either type code 2 or 3, if L is 15, then the value is null.int and the mag
                +---------+---------+-----------+
                |   representation [IEEE-754]   |
                +-------------------------------+
+.KE
 
 Floats are encoded as big endian octets of their IEEE 754 bit patterns.
 
@@ -337,6 +364,7 @@ o  If L is 15, then the value is null.float and the representation is empty.
 .ti 0
 2.1.5 5 Decimals
 
+.KS
 .nf
                   7       4 3       0
                  +---------+---------+
@@ -348,6 +376,7 @@ o  If L is 15, then the value is null.float and the representation is empty.
                  +--------------------------+
                  |    coefficient [Int]     |
                  +--------------------------+
+.KE
 
 .in 3
 Decimal representations have two components: exponent (a VarInt) and coefficient (an Int). The decimal’s value is coefficient * 10 ^ exponent.
@@ -359,6 +388,7 @@ If the value is 0. (aka 0d0) then L is zero, there are no length or representati
 .ti 0
 2.1.6 6 Timestamps
 
+.KS
 .nf
                     7       4 3       0
                    +---------+---------+
@@ -384,6 +414,7 @@ If the value is 0. (aka 0d0) then L is zero, there are no length or representati
                    +============================+
                    : fraction_coefficient [Int] :
                    +============================+
+.KE
 
 .in 3
 Timestamp representations have 7 components, where 5 of these components are optional depending on the precision of the timestamp. The 2 non-optional components are offset and year. The 5 optional components are (from least precise to most precise): month, day, hour and minute, second, fraction_exponent and fraction_coefficient. All of these 7 components are in Universal Coordinated Time (UTC).
@@ -404,10 +435,12 @@ The fraction_exponent and fraction_coefficient denote the fractional seconds of 
 .in 3
 Conversely, none of the following are equivalent:
 
+.KS
 .nf
    68 80 0F D0 81 81 80 80 80       // 2000-01-01T00:00:00Z with no fractional seconds
    69 80 0F D0 81 81 80 80 80 C1    // 2000-01-01T00:00:00.0Z
    69 80 0F D0 81 81 80 80 80 C2    // 2000-01-01T00:00:00.00Z
+.KE
 
 .in 3
 If a timestamp representation has a component of a certain precision, each of the less precise components must also be present or else the representation is illegal. For example, a timestamp representation that has a fraction_exponent and fraction_coefficient component but not the month component, is illegal.
@@ -417,6 +450,7 @@ Note: The component values in the binary encoding are always in UTC, while compo
 .ti 0
 2.1.7 7 Symbols
 
+.KS
 .nf
                  7       4 3       0
                 +---------+---------+
@@ -426,6 +460,7 @@ Note: The component values in the binary encoding are always in UTC, while compo
                 +--------------------------+
                 |     symbol ID [UInt]     |
                 +--------------------------+
+.KE
 
 .in 3
 In the binary encoding, all Ion symbols are stored as integer symbol IDs whose text values are provided by a symbol table. If L is zero then the symbol ID is zero and the length and symbol ID fields are omitted.
@@ -435,6 +470,7 @@ See Ion Symbols for more details about symbol representations and symbol tables
 .ti 0
 2.1.8 8 Strings
 
+.KS
 .nf
                  7       4 3       0
                 +---------+---------+
@@ -444,6 +480,7 @@ See Ion Symbols for more details about symbol representations and symbol tables
                 +==========================+
                 :  representation [UTF8]   :
                 +==========================+
+.KE
 
 .in 3
 These are always sequences of Unicode characters, encoded as a sequence of UTF-8 octets.
@@ -451,6 +488,7 @@ These are always sequences of Unicode characters, encoded as a sequence of UTF-8
 .ti 0
 2.1.9 9 Clobs
 
+.KS
 .nf
                7       4 3       0
               +---------+---------+
@@ -460,6 +498,7 @@ These are always sequences of Unicode characters, encoded as a sequence of UTF-8
               +==========================+
               :       data [Bytes]       :
               +==========================+
+.KE
 
 .in 3
 Values of type clob are encoded as a sequence of octets that should be interpreted as text with an unknown encoding (and thus opaque to the application).
@@ -469,6 +508,7 @@ Zero-length clobs are legal, so L may be zero.
 .ti 0
 2.1.10 0xaL: Blobs
 
+.KS
 .nf
                7       4 3       0
               +---------+---------+
@@ -478,8 +518,9 @@ Zero-length clobs are legal, so L may be zero.
               +==========================+
               :       data [Bytes]       :
               +==========================+
+.KE
 
-.nf
+.in 3
 This is a sequence of octets with no interpretation (and thus opaque to the application).
 
 Zero-length blobs are legal, so L may be zero.
@@ -487,6 +528,7 @@ Zero-length blobs are legal, so L may be zero.
 .ti 0
 2.2.11 0xbL: Lists
 
+.KS
 .nf
                7       4 3       0
               +---------+---------+
@@ -497,6 +539,7 @@ Zero-length blobs are legal, so L may be zero.
               :           value          :
               +==========================+
                          ⋮
+.KE
 
 .in 3
 The representation fields of a list value are simply nested Ion values.
@@ -508,6 +551,7 @@ Because values indicate their total lengths in octets, it is possible to locate 
 .ti 0
 2.2.12 0xcL: S-Expressions
 
+.KS
 .nf
                7       4 3       0
               +---------+---------+
@@ -518,6 +562,7 @@ Because values indicate their total lengths in octets, it is possible to locate 
               :           value          :
               +==========================+
                             ⋮
+.KE
 
 .in 3
 Values of type sexp are encoded exactly as are list values, except with a different type code.
@@ -527,6 +572,7 @@ Values of type sexp are encoded exactly as are list values, except with a differ
 
 Structs are encoded as sequences of symbol/value pairs. Since all symbols are encoded as positive integers, we can omit the typedesc on the field names and just encode the integer value.
 
+.KS
 .nf
                  7       4 3       0
                 +---------+---------+
@@ -537,6 +583,7 @@ Structs are encoded as sequences of symbol/value pairs. Since all symbols are en
                 : field name [VarUInt] :        value         :
                 +======================+======================+
                             ⋮                     ⋮
+.KE
 
 .in 3
 Binary-encoded structs support a special case where the fields are known to be sorted such that the field-name integers are increasing. This state exists when L is one. Thus:
@@ -593,9 +640,11 @@ In the above example, the field name of symbol ID 15 is ignored (regardless of i
 
 The following is malformed because there is an annotation “wrapping” a NOP pad, which is not allowed generally for annotations:
 
+.KS
 .nf
    // {$0:name::<NOP>}
    0xD5 0x80 0xE3 0x81 0x84 0x00
+.KE
 
 .in 3
 
@@ -609,6 +658,7 @@ Annotations are a special type that wrap content identified by the other
 type codes. The annotations themselves are encoded as integer
 symbol IDs.
 
+.KS
 .nf
                        7       4 3       0
                       +---------+---------+
@@ -622,6 +672,7 @@ symbol IDs.
                       +--------------------------+
                       |          value           |
                       +--------------------------+
+.KE
 
 .in 3
 The length field L field indicates the length from the beginning of the

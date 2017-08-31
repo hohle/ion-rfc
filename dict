@@ -77,3 +77,7 @@ validators
 whitespace
 xHH
 xml
+datagram
+eval
+uABCD
+xBeef
