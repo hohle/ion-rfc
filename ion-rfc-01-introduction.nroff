@@ -1,4 +1,4 @@
-.tm 1. Introduction ......................................... \n%
+.tm 1. Introduction ................................................... \n%
 .ti 0
 1. Introduction
 
@@ -35,7 +35,7 @@ feature is that parts of the whole can be accessed without
 "preparation", meaning you don't have to load it into another form
 before accessing the values.
 
-.tm _   1.1 Conventions Used in This Document  ......................................... \n%
+.tm _   1.1 Conventions Used in This Document  ........................ \n%
 .ti 0
 1.1 Conventions Used in This Document
 

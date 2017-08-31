@@ -1,16 +1,16 @@
-.tm 6. References ......................................... \n%
+.tm 10. References .................................................... \n%
 .ti 0
-6.  References
+10.  References
 
-.tm _   6.1. Normative References ......................................... \n%
+.tm _   10.1. Normative References .................................... \n%
 .ti 0
-6.1.  Normative References
+10.1.  Normative References
 
 .in 14
 .ti 3
 [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
 Requirement Levels", BCP 14, RFC 2119, March 1997.
-.\" If you used the keywords, please include RFC 2119 as a normative 
+.\" If you used the keywords, please include RFC 2119 as a normative
 .\" reference.
 
 .ti 3
@@ -20,13 +20,13 @@ Specifications: ABNF", RFC 4234, October 2005.
 .\" formatted in the style of the RFC Editor are available here:
 .\" ftp://ftp.rfc-editor.org/in-notes/rfc-ref.txt
 
-.tm _   6.2. Informative References  ......................................... \n%
+.tm _   10.2. Informative References  ................................. \n%
 .ti 0
-6.2.  Informative References
+10.2.  Informative References
 
 .ti 3
 [2223BIS]  Reynolds, J. and R. Braden, "Instructions to Request for
-Comments (RFC) Authors", draft-rfc-editor-rfc2223bis-08.txt, August 2004.  
+Comments (RFC) Authors", draft-rfc-editor-rfc2223bis-08.txt, August 2004.
 .\" Please include the draft string when referencing drafts.
 .\" Although it will be removed prior to publication, it is helpful
 .\" to the editor for consistency checking.

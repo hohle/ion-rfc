@@ -68,13 +68,13 @@ toc.input: $(SOURCES)
 	# which will block correctly, but include
 	# wrong page numbers
 	nroff -ms $(SOURCES) 2>&1 >/dev/null | \
-	    sed 's/^_//' | \
+	    sed 's/^_/ /' | \
 	    grep -v ': warning: ' | \
 	    sed 's/^/   /' | \
 	    tee $@
 	# do it again with correct line numbers
 	nroff -ms $(SOURCES) 2>&1 >/dev/null | \
-	    sed 's/^_//' | \
+	    sed 's/^_/ /' | \
 	    grep -v ': warning: ' | \
 	    sed 's/^/   /' | \
 	    tee $@

@@ -1,4 +1,4 @@
-.tm 3. Text Encoding ......................................... \n%
+.tm 3. Text Encoding .................................................. \n%
 .ti 0
 3. Ion Text Encoding
 
@@ -8,7 +8,7 @@ The ion text encoding is a value stream which must be a valid sequence
 of Unicode code points in any of the three encoding forms (i.e. UTF-8,
 UTF-16, or UTF-32).
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  3.1. Nulls  .................................................... \n%
 .ti 0
 3.1.1 Nulls
 
@@ -34,7 +34,8 @@ all possible null values as follows:
    null.sexp
 
 .in 3
-The text format treats all of these as reserved tokens; to use those same characters as a symbol, they must be enclosed in single-quotes:
+The text format treats all of these as reserved tokens; to use those
+same characters as a symbol, they must be enclosed in single-quotes:
 
 .nf
    null        // The type is null
@@ -42,12 +43,13 @@ The text format treats all of these as reserved tokens; to use those same charac
    null.list   // The type is list
    'null.int'  // The type is symbol
 
-(As a historical aside, the null type exists primarily for compatibility with JSON, which has only the untyped null value.)
+(As a historical aside, the null type exists primarily for compatibility
+with JSON, which has only the untyped null value.)
 
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  3.2. Booleans .................................................. \n%
 .ti 0
-3.1.1 Booleans
+3.2. Booleans
 
 The bool type is self-explanatory, but note that (as with all Ion types)
 there's a null value. Thus the set of all Boolean values consists of the
@@ -63,9 +65,9 @@ following three reserved tokens:
 (As with the null values, one can single-quote those tokens to force
 them to be parsed as symbols.)
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  3.3. Integers .................................................. \n%
 .ti 0
-3.1.1 Integers
+3.3 Integers
 
 The text format allows hexadecimal and binary (but not octal) notation,
 but such notation will not be maintained during binary-to-text
@@ -98,9 +100,9 @@ separate digits.
 In the text notation, integer values must be followed by one of the
 thirteen numeric stop-characters: {}[](),\\"\\'\\ \\t\\n\\r.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  3.4. Floats .................................................... \n%
 .ti 0
-2.1.1 Floats
+3.4. Floats
 
 In the text format, float values are denoted much like the decimal
 formats in C or Java. As with JSON, extra leading zeros are not allowed.
@@ -108,9 +110,9 @@ Digits may be separated with an underscore.
 
 .nf
    null.float        // A null float value
-   
+
    -0.12e4           // Type is float
-   
+
    0E0               // Zero as float
    -0e0              // Negative zero float   (distinct from positive zero)
 
@@ -126,9 +128,9 @@ Because most decimal values cannot be represented exactly in binary
 floating-point, float values may change “appearance” and precision when
 reading or writing Ion text.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  3.5. Decimals .................................................. \n%
 .ti 0
-2.1.1 Decimals
+3.5. Decimals
 
 In the text format, decimal values use d instead of e to start the
 exponent. Reals without an exponent are treated as decimal. As with
@@ -137,18 +139,18 @@ an underscore.
 
 .nf
    null.decimal      // A null decimal value
-   
+
    0.123             // Type is decimal
    -0.12d4           // Type is decimal
-   
+
    0D0               // Zero as decimal
    0.                //   ...the same value with different notation
    -0d0              // Negative zero decimal (distinct from positive zero)
    -0.               //   ...the same value with different notation
    -0d-1             // Decimal maintains precision: -0. != -0.0
-   
+
    123_456.789_012   // Decimal with underscores
-   
+
    123_._456         // ERROR: underscores may not appear next to the decimal point
    12__34.56         // ERROR: consecutive underscores not allowed
    123.456_          // ERROR: trailing underscore not allowed
@@ -159,9 +161,9 @@ an underscore.
 The precision of decimal values, including trailing zeros, is
 significant and is preserved through round-trips.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  3.6. Timestamps ................................................ \n%
 .ti 0
-2.1.1 Timestamps
+3.6 Timestamps
 
 In the text format, timestamps follow the W3C note on date and time
 formats, but they must end with the literal "T" if not at least
@@ -187,7 +189,7 @@ be UTC values with unknown local offset.
 
 .nf
    null.timestamp                 // A null timestamp value
-   
+
    2007-02-23T12:14Z              // Seconds are optional, but local
                                   // offset is not
    2007-02-23T12:14:33.079-08:00  // A timestamp with millisecond
@@ -198,18 +200,18 @@ be UTC values with unknown local offset.
                                   // local offset
    2007-02-23T20:14:33.079-00:00  // The same instant, with unknown
                                   // local offset
-   
+
    2007-01-01T00:00-00:00         // Happy New Year in UTC, unknown local offset
    2007-01-01                     // The same instant, with days precision, unknown local offset
    2007-01-01T                    // The same value, different syntax.
    2007-01T                       // The same instant, with months precision, unknown local offset
    2007T                          // The same instant, with years precision, unknown local offset
-   
-   2007-02-23                     // A day, unknown local offset 
+
+   2007-02-23                     // A day, unknown local offset
    2007-02-23T00:00Z              // The same instant, but more precise and in UTC
    2007-02-23T00:00+00:00         // An equivalent format for the same value
    2007-02-23T00:00:00-00:00      // The same instant, with seconds precision
-   
+
    2007                           // Not a timestamp, but an int
    2007-01                        // ERROR: Must end with 'T' if not
                                   // whole-day precision, this results
@@ -220,11 +222,11 @@ be UTC values with unknown local offset.
 Zero and negative dates are not valid, so the earliest instant in time
 that can be represented as a timestamp is Jan 01, 0001. As per the W3C
 note, leap seconds cannot be represented.
-   
+
 Two timestamps are only equivalent if they represent the same instant
 with the same offset and precision. This means that the following are
 not equivalent:
-  
+
 .nf
    2000T                          // January 1st 2000, year precision, unknown local offset
    2000-01-01T00:00:00Z           // January 1st 2000, second precision, UTC
@@ -235,9 +237,9 @@ not equivalent:
 In the text notation, timestamp values must be followed by one of the
 thirteen numeric stop-characters: {}[](),\\"\\'\\ \\t\\n\\r.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  3.7. Strings ................................................... \n%
 .ti 0
-2.1.1 Strings
+3.7. Strings
 
 In the text format, strings are delimited by double-quotes and follow
 C/Java backslash-escape conventions (see below).
@@ -251,9 +253,9 @@ C/Java backslash-escape conventions (see below).
    xml::"<e a='v'>c</e>"  // String with type annotation 'xml'
 .in 3
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     3.7.1 Long Strings .......................................... \n%
 .ti 0
-2.1.1.x Long Strings
+3.7.1 Long Strings
 
 The text format supports an alternate syntax for "long strings",
 including those that break across lines. Sequences bounded by three
@@ -280,9 +282,9 @@ between two long strings.
    '''
 .in 3
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     3.7.2. Escape Characters .................................... \n%
 .ti 0
-2.1.1.x Escape Characters
+3.7.2. Escape Characters
 
 The Ion text format supports escape sequences only within quoted strings
 and symbols. Ion supports most of the escape sequences defined by C++,
@@ -328,9 +330,9 @@ o General octal escape sequences, \\OOO
 
 .in 3
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  3.8. Symbols ................................................... \n%
 .ti 0
-2.1.1 Symbols
+3.8. Symbols
 
 In the text format, symbols are delimited by single-quotes and use the
 same escape characters as [Strings].
@@ -369,9 +371,9 @@ does not retain whitespace.
 See Ion Symbols for more details about symbol representations and
 symbol tables.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  3.9. Blobs ..................................................... \n%
 .ti 0
-2.1.1 Blobs
+3.9. Blobs
 
 In the text format, blob values are denoted as [RFC 4648]-compliant
 Base64 text within two pairs of curly braces.
@@ -396,31 +398,31 @@ The / character is always considered part of the Base64 data.
 .nf
     // A null blob value
     null.blob
-    
+
     // A valid blob value with zero padding characters.
     {{
       +AB/
     }}
-    
+
     // A valid blob value with one required padding character.
     {{ VG8gaW5maW5pdHkuLi4gYW5kIGJleW9uZCE= }}
-    
+
     // ERROR: Incorrect number of padding characters.
     {{ VG8gaW5maW5pdHkuLi4gYW5kIGJleW9uZCE== }}
-    
+
     // ERROR: Padding character within the data.
     {{ VG8gaW5maW5pdHku=Li4gYW5kIGJleW9uZCE= }}
-    
+
     // A valid blob value with two required padding characters.
     {{ dHdvIHBhZGRpbmcgY2hhcmFjdGVycw== }}
-    
+
     // ERROR: Invalid character within the data.
     {{ dHdvIHBhZGRpbmc_gY2hhcmFjdGVycw= }}
 
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  3.10. Clobs .................................................... \n%
 .ti 0
-2.1.1 Clobs
+3.10. Clobs
 
 In the text format, clob values use similar syntax to blob, but the data
 between braces must be one string. The string may only contain legal
@@ -435,15 +437,15 @@ differences between Ion strings and clobs.
 
 .nf
    null.clob  // A null clob value
-   
+
    {{ "This is a CLOB of text." }}
-   
+
    shift_jis ::
    {{
      '''Another clob with user-defined encoding, '''
      '''this time on multiple lines.'''
    }}
-   
+
    {{
      // ERROR
      "comments not allowed"
@@ -454,9 +456,9 @@ Note that the shift_jis type annotation above is, like all type
 annotations, application-defined. Ion does not interpret or validate
 that symbol; that’s left to the application.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  3.11. Structs .................................................. \n%
 .ti 0
-2.2.1 Structures
+3.11. Structures
 
 In the text format, structures are wrapped by curly braces, with a colon
 between each name and value, and a comma between the fields. For the
@@ -481,15 +483,15 @@ not be annotated. The value of a field may be annotated like any other
 value. Syntactically the field name comes first, then annotations, then
 the content.
 
-.nf 
+.nf
    { annotation:: field_name: value }  // ERROR
    { field_name: annotation:: value }  // Okay
 
 .in 3
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  3.12. Lists .................................................... \n%
 .ti 0
-2.2.2 Lists
+3.12. Lists
 
 In the text format, lists are bounded by square brackets and elements
 are separated by commas.
@@ -505,9 +507,9 @@ are separated by commas.
 
 .in 3
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  3.13. S-Expressions ............................................ \n%
 .ti 0
-2.2.3 S-Expressions
+3.13. S-Expressions
 
 In the text format, S-expressions are bounded by parentheses.
 S-expressions also allow unquoted operator symbols (in addition to the
@@ -519,7 +521,7 @@ interpreted as values rather than element separators.
    ()                // An empty expression value
    (cons 1 2)        // S-expression of three values
    ([hello][there])  // S-expression containing two lists
-   
+
    (a+-b)  ( 'a' '+-' 'b' )    // Equivalent; three symbols
    (a.b;)  ( 'a' '.' 'b' ';')  // Equivalent; four symbols
 
@@ -528,23 +530,31 @@ Although Ion S-expressions use a syntax similar to Lisp expressions, Ion
 does not define their interpretation or any semantics at all, beyond the
 pure sequence-of-values data model indicated above.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  3.14. Type Annotations ......................................... \n%
 .ti 0
-2.2.4 Type Annotations
+3.14. Type Annotations
 
 In the text format, type annotations are denoted by a non-null symbol
 token and double-colons preceding any content:
 
 .nf
-   int32::12                                // Suggests 32 bits as end-user type
-   'my.custom.type' :: { x : 12 , y : -1 }  // Gives a struct a user-defined type
-   
-   { field: something::'another thing'::value }  // Field's name must precede annotations of its value
-   
-   jpeg :: {{ ... }}                        // Indicates the blob contains jpeg data
-   bool :: null.int                         // A very misleading annotation on the integer null
+   int32::12                                // Suggests 32 bits as
+                                            // end-user type
+   'my.custom.type' :: { x : 12 , y : -1 }  // Gives a struct a
+                                            // user-defined type
+
+   { field: something::'another thing'::value }  // Field's name must
+                                                 // precede annotations
+                                                 // of its value
+
+   jpeg :: {{ ... }}                        // Indicates the blob
+                                            // contains jpeg data
+   bool :: null.int                         // A very misleading
+                                            // annotation on the
+                                            // integer null
    '' :: 1                                  // An empty annotation
-   null.symbol :: 1                         // ERROR: type annotation cannot be null 
+   null.symbol :: 1                         // ERROR: type annotation
+                                            // cannot be null
 
 .in 3
 Except for a small number of predefined system annotations, Ion itself

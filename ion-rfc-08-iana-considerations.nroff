@@ -1,4 +1,4 @@
-.tm 8. IANA Considerations .................................... \n%
+.tm 8. IANA Considerations ............................................ \n%
 .ti 0
 8.  IANA Considerations
 
@@ -19,7 +19,7 @@ Encoding considerations: binary
 
 Security considerations: See [RFC Ion], Section 7.
 
-Interoperaaability considerations: Described in [RFC Ion].
+Interoperability considerations: Described in [RFC Ion].
 
 Published specification: [RFC Ion]
 
@@ -51,7 +51,7 @@ Restrictions on usage: none
 Author:
 
 .in 6
-    Originally written by Todd Jonker, Alman Goo, and Jonathan Hohle
+    Originally written by Todd Jonker, Almann Goo, and Jonathan Hohle
 
     Translated to RFC by Jonathan Hohle
 

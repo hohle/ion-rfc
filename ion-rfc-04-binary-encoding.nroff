@@ -1,4 +1,4 @@
-.tm 4. Binary Encoding ......................................... \n%
+.tm 4. Binary Encoding ................................................ \n%
 .ti 0
 4. Ion Binary Encoding
 
@@ -55,15 +55,17 @@ Note: The BVM is not a value and should not be visible to or manipulable
 by the user; it is internal data managed by and for the
 Ion implementation.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  4.1. Basic Field Formats ....................................... \n%
 .ti 0
-4.1 Basic Field Formats
+4.1. Basic Field Formats
 
 Binary-encoded Ion values are comprised of one or more fields, and the
 fields use a small number of basic formats (separate from the Ion types
 visible to users).
 
-4.1.1 UInt and Int Fields
+.tm _     4.1.1. UInt and Int Fields .................................. \n%
+.ti 0
+4.1.1. UInt and Int Fields
 
 UInt and Int fields represent fixed-length unsigned and signed integer
 values. These field formats are always used in some context that clearly
@@ -114,9 +116,9 @@ only differ in their sign bit. (See
 http://en.wikipedia.org/wiki/Signed_number_representation for more
 info.)
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.1.2. VarUInt and VarInt Fields ............................ \n%
 .ti 0
-4.1.2 VarUInt and VarInt Fields
+4.1.2. VarUInt and VarInt Fields
 
 VarUInt and VarInt fields represent self-delimiting, variable-length
 unsigned and signed integer values. These field formats are always used
@@ -183,9 +185,9 @@ down to:
 
 .in 3
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  4.2. Typed Value Formats ....................................... \n%
 .ti 0
-4.2 Typed Value Formats
+4.2. Typed Value Formats
 
 A value consists of a one-octet type descriptor, possibly followed by a
 length in octets, possibly followed by a representation.
@@ -234,9 +236,9 @@ o If the representation is at least 14 bytes long, then L is set to 14,
 and the length field is set to the representation length, encoded as a
 VarUInt field.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.1. 0: Nulls ............................................. \n%
 .ti 0
-4.2.1 0 Nulls
+4.2.1. 0: Nulls
 
 .KS
 .nf
@@ -247,7 +249,9 @@ VarUInt field.
 .KE
 
 .in 3
-Values of type null always have empty lengths and representations. The only valid L value is 15, representing the only value of this type, null.null.
+Values of type null always have empty lengths and representations. The
+only valid L value is 15, representing the only value of this type,
+null.null.
 
 4.2.1.1 NOP Padding
 
@@ -264,11 +268,17 @@ Values of type null always have empty lengths and representations. The only vali
 .KE
 
 .in 3
-In addition to null.null, the null type code is used to encode padding that has no operation (NOP padding). This can be used for “binary whitespace” when alignment of octet boundaries is needed or to support in-place editing. Such encodings are not considered values and are ignored by the processor.
+In addition to null.null, the null type code is used to encode padding
+that has no operation (NOP padding). This can be used for "binary
+whitespace" when alignment of octet boundaries is needed or to support
+in-place editing. Such encodings are not considered values and are
+ignored by the processor.
 
-In this encoding, L specifies the number of octets that should be ignored.
+In this encoding, L specifies the number of octets that should
+be ignored.
 
-The following is a single byte NOP pad. The NOP padding typedesc bytes are counted as padding:
+The following is a single byte NOP pad. The NOP padding typedesc bytes
+are counted as padding:
 
 .nf
    0x00
@@ -280,7 +290,8 @@ The following is a two byte NOP pad:
    0x01 0xFE
 
 .in 3
-Note that the single byte of “payload” 0xFE is arbitrary and ignored by the parser.
+Note that the single byte of “payload” 0xFE is arbitrary and ignored by
+the parser.
 
 The following is a 16 byte NOP pad:
 
@@ -288,11 +299,13 @@ The following is a 16 byte NOP pad:
    0x0E 0x8E 0x00 ... <12 arbitrary octets> ... 0x00
 
 .in 3
-NOP padding is valid anywhere a value can be encoded, except for within an annotation wrapper. NOP padding in struct requires additional encoding considerations.
+NOP padding is valid anywhere a value can be encoded, except for within
+an annotation wrapper. NOP padding in struct requires additional
+encoding considerations.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.2. 1: Booleans .......................................... \n%
 .ti 0
-2.1.2 1 Booleans
+4.2.2. 1: Booleans
 
 .KS
 .nf
@@ -303,13 +316,18 @@ NOP padding is valid anywhere a value can be encoded, except for within an annot
 .KE
 
 .in 3
-Values of type bool always have empty lengths, and their representation is stored in the typedesc itself (rather than after the typedesc). A representation of 0 means false; a representation of 1 means true; and a representation of 15 means null.bool.
+Values of type bool always have empty lengths, and their representation
+is stored in the typedesc itself (rather than after the typedesc). A
+representation of 0 means false; a representation of 1 means true; and a
+representation of 15 means null.bool.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.3. 2 & 3: Integers ...................................... \n%
 .ti 0
-2.1.3 2 & 3 Integers
+4.2.3. 2 & 3: Integers
 
-Values of type int are stored using two type codes: 2 for positive values and 3 for negative values. Both codes use a UInt subfield to store the magnitude.
+Values of type int are stored using two type codes: 2 for positive
+values and 3 for negative values. Both codes use a UInt subfield to
+store the magnitude.
 
 .KS
 .nf
@@ -326,13 +344,17 @@ Values of type int are stored using two type codes: 2 for positive values and 3 
 .in 3
 Zero is always stored as positive; negative zero is illegal.
 
-If the value is zero then T must be 2, L is zero, and there are no length or magnitude subfields. As a result, when T is 3, both L and the magnitude subfield must be non-zero.
+If the value is zero then T must be 2, L is zero, and there are no
+length or magnitude subfields. As a result, when T is 3, both L and the
+magnitude subfield must be non-zero.
 
-With either type code 2 or 3, if L is 15, then the value is null.int and the magnitude is empty. Note that this implies there are two equivalent binary representations of null integer values.
+With either type code 2 or 3, if L is 15, then the value is null.int and
+the magnitude is empty. Note that this implies there are two equivalent
+binary representations of null integer values.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.4. 4: Floats ............................................ \n%
 .ti 0
-2.1.4 4 Floats
+4.2.4. 4: Floats
 
 .KS
 .nf
@@ -357,21 +379,28 @@ o If L is 8, then the representation is 64 bits (8 octets).
 
 .in 3
 There are two exceptions for the L field:
- 
+
 .in 9
 .ti 6
 o If L is 0, then the the value is 0e0 and representation is empty.
-  Note: this is not to be confused with -0e0 which is a distinct value and in current Ion must be encoded as a normal IEEE float bit pattern.
+
+  Note: This is not to be confused with -0e0 which is a distinct value
+        and in current Ion must be encoded as a normal IEEE float
+        bit pattern.
 
 .ti 6
-o  If L is 15, then the value is null.float and the representation is empty.
-   Note: Ion 1.0 only supports 32-bit and 64-bit float values (i.e. L size 4 or 8), but future versions of the standard may support 16-bit and 128-bit float values.
+o  If L is 15, then the value is null.float and the representation is
+   empty.
+
+   Note: Ion 1.0 only supports 32-bit and 64-bit float values (i.e. L
+         size 4 or 8), but future versions of the standard may support
+         16-bit and 128-bit float values.
 
 .in 3
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.5. 5: Decimals .......................................... \n%
 .ti 0
-2.1.5 5 Decimals
+4.2.5. 5: Decimals
 
 .KS
 .nf
@@ -388,15 +417,22 @@ o  If L is 15, then the value is null.float and the representation is empty.
 .KE
 
 .in 3
-Decimal representations have two components: exponent (a VarInt) and coefficient (an Int). The decimal’s value is coefficient * 10 ^ exponent.
+Decimal representations have two components: exponent (a VarInt) and
+coefficient (an Int). The decimal’s value is coefficient * 10 ^
+exponent.
 
-The length of the coefficient subfield is the total length of the representation minus the length of exponent. The subfield should not be present (that is, it has zero length) when the coefficient’s value is (positive) zero.
+The length of the coefficient subfield is the total length of the
+representation minus the length of exponent. The subfield should not be
+present (that is, it has zero length) when the coefficient’s value is
+(positive) zero.
 
-If the value is 0. (aka 0d0) then L is zero, there are no length or representation fields, and the entire value is encoded as the single byte 0x50.
+If the value is 0. (aka 0d0) then L is zero, there are no length or
+representation fields, and the entire value is encoded as the single
+byte 0x50.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.6. 6: Timestamps ........................................ \n%
 .ti 0
-2.1.6 6 Timestamps
+4.2.6. 6: Timestamps
 
 .KS
 .nf
@@ -427,13 +463,25 @@ If the value is 0. (aka 0d0) then L is zero, there are no length or representati
 .KE
 
 .in 3
-Timestamp representations have 7 components, where 5 of these components are optional depending on the precision of the timestamp. The 2 non-optional components are offset and year. The 5 optional components are (from least precise to most precise): month, day, hour and minute, second, fraction_exponent and fraction_coefficient. All of these 7 components are in Universal Coordinated Time (UTC).
+Timestamp representations have 7 components, where 5 of these components
+are optional depending on the precision of the timestamp. The 2
+non-optional components are offset and year. The 5 optional components
+are (from least precise to most precise): month, day, hour and minute,
+second, fraction_exponent and fraction_coefficient. All of these 7
+components are in Universal Coordinated Time (UTC).
 
-The offset denotes the local-offset portion of the timestamp, in minutes difference from UTC.
+The offset denotes the local-offset portion of the timestamp, in minutes
+difference from UTC.
 
-The hour and minute is considered as a single component, that is, it is illegal to have hour but not minute (and vice versa).
+The hour and minute is considered as a single component, that is, it is
+illegal to have hour but not minute (and vice versa).
 
-The fraction_exponent and fraction_coefficient denote the fractional seconds of the timestamp as a decimal value. The fractional seconds’ value is coefficient * 10 ^ exponent. It must be greater than or equal to zero and less than 1. A missing coefficient defaults to zero. Fractions whose coefficient is zero and exponent is greater than -1 are ignored. The following hex encoded timestamps are equivalent:
+The fraction_exponent and fraction_coefficient denote the fractional
+seconds of the timestamp as a decimal value. The fractional seconds'
+value is coefficient * 10 ^ exponent. It must be greater than or equal
+to zero and less than 1. A missing coefficient defaults to zero.
+Fractions whose coefficient is zero and exponent is greater than -1 are
+ignored. The following hex encoded timestamps are equivalent:
 
 .nf
    68 80 0F D0 81 81 80 80 80       // 2000-01-01T00:00:00Z with no fractional seconds
@@ -453,13 +501,19 @@ Conversely, none of the following are equivalent:
 .KE
 
 .in 3
-If a timestamp representation has a component of a certain precision, each of the less precise components must also be present or else the representation is illegal. For example, a timestamp representation that has a fraction_exponent and fraction_coefficient component but not the month component, is illegal.
+If a timestamp representation has a component of a certain precision,
+each of the less precise components must also be present or else the
+representation is illegal. For example, a timestamp representation that
+has a fraction_exponent and fraction_coefficient component but not the
+month component, is illegal.
 
-Note: The component values in the binary encoding are always in UTC, while components in the text encoding are in the local time! This means that transcoding requires a conversion between UTC and local time.
+Note: The component values in the binary encoding are always in UTC,
+while components in the text encoding are in the local time! This means
+    that transcoding requires a conversion between UTC and local time.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.7. 7: Symbols ........................................... \n%
 .ti 0
-2.1.7 7 Symbols
+4.2.7. 7: Symbols
 
 .KS
 .nf
@@ -474,13 +528,16 @@ Note: The component values in the binary encoding are always in UTC, while compo
 .KE
 
 .in 3
-In the binary encoding, all Ion symbols are stored as integer symbol IDs whose text values are provided by a symbol table. If L is zero then the symbol ID is zero and the length and symbol ID fields are omitted.
+In the binary encoding, all Ion symbols are stored as integer symbol IDs
+whose text values are provided by a symbol table. If L is zero then the
+symbol ID is zero and the length and symbol ID fields are omitted.
 
-See Ion Symbols for more details about symbol representations and symbol tables
+See Ion Symbols for more details about symbol representations and
+symbol tables
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.8. 8: Strings ........................................... \n%
 .ti 0
-2.1.8 8 Strings
+4.2.8. 8: Strings
 
 .KS
 .nf
@@ -495,11 +552,12 @@ See Ion Symbols for more details about symbol representations and symbol tables
 .KE
 
 .in 3
-These are always sequences of Unicode characters, encoded as a sequence of UTF-8 octets.
+These are always sequences of Unicode characters, encoded as a sequence
+of UTF-8 octets.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.9. 9: Clobs ............................................. \n%
 .ti 0
-2.1.9 9 Clobs
+4.2.9. 9: Clobs
 
 .KS
 .nf
@@ -514,13 +572,15 @@ These are always sequences of Unicode characters, encoded as a sequence of UTF-8
 .KE
 
 .in 3
-Values of type clob are encoded as a sequence of octets that should be interpreted as text with an unknown encoding (and thus opaque to the application).
+Values of type clob are encoded as a sequence of octets that should be
+interpreted as text with an unknown encoding (and thus opaque to
+the application).
 
 Zero-length clobs are legal, so L may be zero.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.10. 10: Blobs ........................................... \n%
 .ti 0
-2.1.10 0xaL: Blobs
+4.2.10. 10: Blobs
 
 .KS
 .nf
@@ -535,13 +595,14 @@ Zero-length clobs are legal, so L may be zero.
 .KE
 
 .in 3
-This is a sequence of octets with no interpretation (and thus opaque to the application).
+This is a sequence of octets with no interpretation (and thus opaque to
+the application).
 
 Zero-length blobs are legal, so L may be zero.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.11. 11: Lists ........................................... \n%
 .ti 0
-2.2.11 0xbL: Lists
+4.2.11. 11: Lists
 
 .KS
 .nf
@@ -559,13 +620,16 @@ Zero-length blobs are legal, so L may be zero.
 .in 3
 The representation fields of a list value are simply nested Ion values.
 
-When L is 15, the value is null.list and there’s no length or nested values. When L is 0, the value is an empty list, and there’s no length or nested values.
+When L is 15, the value is null.list and there’s no length or nested
+values. When L is 0, the value is an empty list, and there’s no length
+or nested values.
 
-Because values indicate their total lengths in octets, it is possible to locate the beginning of each successive value in constant time.
+Because values indicate their total lengths in octets, it is possible to
+locate the beginning of each successive value in constant time.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.12. 12: S-Expressions ................................... \n%
 .ti 0
-2.2.12 0xcL: S-Expressions
+4.2.12. 12: S-Expressions
 
 .KS
 .nf
@@ -581,13 +645,16 @@ Because values indicate their total lengths in octets, it is possible to locate 
 .KE
 
 .in 3
-Values of type sexp are encoded exactly as are list values, except with a different type code.
+Values of type sexp are encoded exactly as are list values, except with
+a different type code.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.13. 13: Structures ...................................... \n%
 .ti 0
-2.2.13 0xdL: Structures
+4.2.13. 13: Structures
 
-Structs are encoded as sequences of symbol/value pairs. Since all symbols are encoded as positive integers, we can omit the typedesc on the field names and just encode the integer value.
+Structs are encoded as sequences of symbol/value pairs. Since all
+symbols are encoded as positive integers, we can omit the typedesc on
+the field names and just encode the integer value.
 
 .KS
 .nf
@@ -603,44 +670,65 @@ Structs are encoded as sequences of symbol/value pairs. Since all symbols are en
 .KE
 
 .in 3
-Binary-encoded structs support a special case where the fields are known to be sorted such that the field-name integers are increasing. This state exists when L is one. Thus:
+Binary-encoded structs support a special case where the fields are known
+to be sorted such that the field-name integers are increasing. This
+state exists when L is one. Thus:
 
 .in 9
 .ti 6
-o When L is 0, the value is an empty struct, and there’s no length or nested fields.
+o When L is 0, the value is an empty struct, and there’s no length or
+  nested fields.
 
 .ti 6
-o When L is 1, the struct has at least one symbol/value pair, the length field exists, and the field name integers are sorted in increasing order.
+o When L is 1, the struct has at least one symbol/value pair, the length
+  field exists, and the field name integers are sorted in
+  increasing order.
 
 .ti 6
-o When L is 15, the value is null.struct, and there’s no length or nested fields.
+o When L is 15, the value is null.struct, and there’s no length or
+  nested fields.
 
 .ti 6
-o When 1 < L < 14 then there is no length field as L is enough to represent the struct size, and no assertion is made about field ordering.
+o When 1 < L < 14 then there is no length field as L is enough to
+  represent the struct size, and no assertion is made about
+  field ordering.
 
 .ti 6
-o Otherwise, the length field exists, and no assertion is made about field ordering.
+o Otherwise, the length field exists, and no assertion is made about
+  field ordering.
 
 .in 3
-Note: Because VarUInts depend on end tags to indicate their lengths, finding the succeeding value requires parsing the field name prefix. However, VarUInts are a more compact representation than Int values.
+Note: Because VarUInts depend on end tags to indicate their lengths,
+finding the succeeding value requires parsing the field name prefix.
+However, VarUInts are a more compact representation than Int values.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _        4.2.13.1. NOP Padding in struct Fields ................... \n%
 .ti 0
-5.2.13.1 NOP Padding in struct Fields
+4.2.13.1. NOP Padding in struct Fields
 
-NOP Padding in struct values requires additional consideration of the field name element. If the “value” of a struct field is the NOP pad, then the field name is ignored. This means that it is not possible to encode padding in a struct value that is less than two bytes.
+NOP Padding in struct values requires additional consideration of the
+field name element. If the “value” of a struct field is the NOP pad,
+then the field name is ignored. This means that it is not possible to
+encode padding in a struct value that is less than two bytes.
 
-Implementations should use symbol ID zero as the field name to emphasize the lack of meaning of the field name. For more general details about the semantics of symbol ID zero, refer to Ion Symbols.
+Implementations should use symbol ID zero as the field name to emphasize
+the lack of meaning of the field name. For more general details about
+the semantics of symbol ID zero, refer to Ion Symbols.
 
-For example, consider the following empty struct with three bytes of padding:
+For example, consider the following empty struct with three bytes
+of padding:
 
 .nf
    0xD3 0x80 0x01 0xAC
 
 .in 3
-In the above example, the struct declares that it is three bytes large, and the encoding of the pair of symbol ID zero followed by a pad that is two bytes large (note the last octet 0xAC is completely arbitrary and never interpreted by an implementation).
+In the above example, the struct declares that it is three bytes large,
+and the encoding of the pair of symbol ID zero followed by a pad that is
+two bytes large (note the last octet 0xAC is completely arbitrary and
+never interpreted by an implementation).
 
-The following is an example of struct with a single field with four total bytes of padding:
+The following is an example of struct with a single field with four
+total bytes of padding:
 
 .nf
    0xD7 0x84 0x81 "a" 0x80 0x02 0x01 0x02
@@ -654,9 +742,11 @@ The following is also a empty struct, with a two byte pad:
    0xD2 0x8F 0x00
 
 .in 3
-In the above example, the field name of symbol ID 15 is ignored (regardless of if it is a valid symbol ID).
+In the above example, the field name of symbol ID 15 is ignored
+(regardless of if it is a valid symbol ID).
 
-The following is malformed because there is an annotation “wrapping” a NOP pad, which is not allowed generally for annotations:
+The following is malformed because there is an annotation “wrapping” a
+NOP pad, which is not allowed generally for annotations:
 
 .KS
 .nf
@@ -666,9 +756,9 @@ The following is malformed because there is an annotation “wrapping” a NOP p
 
 .in 3
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.14. 14: Type Annotations ................................ \n%
 .ti 0
-4.2.14 0xeL: Type Annotations
+4.2.14. 14: Type Annotations
 
 This special type code doesn't map to an Ion value type, but instead is
 a wrapper used to associate annotations with content.
@@ -721,16 +811,16 @@ Note: Because L cannot be zero, the octet 0xE0 is not a valid type
 descriptor. Instead, that octet signals the start of a binary
 version marker.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _     4.2.15. 15: Reserved ........................................ \n%
 .ti 0
-4.2.15 0xfL: Reserved
+4.2.15. 15: Reserved
 
 The remaining type code, 15, is reserved for future use and is not legal
 in Ion 1.0 data.
 
-.tm _       2.1.5. Timestamps ......................................... \n%
+.tm _  4.3. Illegal Type Descriptors .................................. \n%
 .ti 0
-4.3 Illegal Type Descriptors
+4.3. Illegal Type Descriptors
 
 The preceding sections define valid type descriptor octets, composed of
 a type code (T) in the upper four bits and a length field (L) in the
