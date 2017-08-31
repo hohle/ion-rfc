@@ -1,0 +1,243 @@
+.ti 0
+2. The Ion Data Model ..............................................2
+
+The semantic basis of Ion is an abstract data model, composed of a set
+of primitive types and a set of recursively-defined container types. All
+types support null values and user-defined type annotations.
+
+It's important to note that the data model is value-based and does not
+include references. As a result, the data model can express data
+hierarchies (values can be nested to arbitrary depth), but not general
+directed graphs.
+
+Here's an overview of the core data types:
+
+.in 9
+.ti 6
+o null - A generic null value
+
+.ti 6
+o bool - Boolean values
+
+.ti 6
+o int - Signed integers of arbitrary size
+
+.ti 6
+o float - Binary-encoded floating point numbers (IEEE 64-bit)
+
+.ti 6
+o decimal - Decimal-encoded real numbers of arbitrary precision
+
+.ti 6
+o timestamp - Date/time/timezone moments of arbitrary precision
+
+.ti 6
+o string - Unicode text literals
+
+.ti 6
+o symbol - Interned, Unicode symbolic atoms (aka identifiers)
+
+.ti 6
+o blob - Binary data of user-defined encoding
+
+.ti 6
+o clob - Text data of user-defined encoding
+
+.ti 6
+o struct - Unordered collections of tagged values
+
+.ti 6
+o list - Ordered collections of values
+
+.ti 6
+o sexp - Ordered collections of values with application-defined
+      semantics
+
+.in 3
+.ti 0
+2.1. Primitive Types ............................................2
+
+The Ion primitive types represent scalar values including nulls,
+booleans, numbers, timestamps, character sequences, and symbols.
+
+.ti 0
+2.1.1 Null Values ............................................4
+
+Ion supports distinct null values for every core type, as well as a
+separate null type that's distinct from all other types.
+
+Null values exist for all core types, including the null type. The null
+type has a single value, null.
+
+As a historical aside, the null type exists primarily for compatibility
+with JSON, which has only the untyped null value.
+
+.ti 0
+2.1.1 Booleans ...............................................4
+
+The bool type may have a value of true, false, or, null.
+
+.ti 0
+2.1.1 Integers ...............................................4
+
+The int type consists of signed integers of arbitrary size.
+
+.ti 0
+2.1.1 Real Numbers ...........................................4
+
+Ion supports both binary and lossless decimal encodings of real numbers
+as, respectively, types float and decimal.
+
+.ti 0
+2.1.1.1 Float
+
+The float type denotes either 32-bit or 64-bit IEEE-754 floating-point
+values; other sizes may be supported in future versions of this
+specification.
+
+.ti 0
+2.1.1.2 Decimal
+
+Because most decimal values cannot be represented exactly in binary
+floating-point, float values may change "appearance" and precision when
+being read or written. The decimal type, however, has significant
+precision, including trailing zeros and is preserved through
+round-trips.
+
+.ti 0
+2.1.1 Timestamps .............................................4
+
+Timestamps represent a specific moment in time, always include a local
+offset, and are capable of arbitrary precision.
+
+.in 3
+Values that are precise only to the year, month, or date are assumed to
+be UTC values with unknown local offset.
+
+Zero and negative dates are not valid, so the earliest instant in time
+that can be represented as a timestamp is Jan 01, 0001. As per the W3C
+note, leap seconds cannot be represented.
+
+Two timestamps are only equivalent if they represent the same instant
+with the same offset and precision.
+
+.ti 0
+2.1.1 Strings ................................................4
+
+Ion string values are Unicode character sequences of arbitrary length.
+
+.ti 0
+2.1.1 Symbols ................................................4
+
+Symbols are much like strings, in that they are Unicode character
+sequences. The primary difference is the intended semantics: symbols
+represent semantic identifiers as opposed to textual literal values.
+Symbols are case sensitive.
+
+Symbols may be shared between applications out of band or stored
+separately from data at rest using symbol tables.
+
+TODO: differentiate symbol from symbol token
+
+.ti 0
+2.2.2 Ion Version Markers
+
+.ti 0
+2.1.1 Blobs
+
+The blob type allows embedding of arbitrary raw binary data. Ion treats
+such data as a single (though often very large) value. It does no
+processing of such data other than passing it through intact.
+
+.ti 0
+2.1.1 Clobs
+
+The clob type is similar to blob in that it holds uninterpreted binary
+data, the difference is that the content is expected to be text. Like
+blobs, clobs are a sequence of raw octets that are not given any special
+interpretation. This guarantees that the value can be transmitted
+without modification.
+
+.ti 0
+2.2. Container Types
+
+Ion defines three container types: structures, lists, and S-expressions.
+These types are defined recursively and may contain values of any
+Ion type.
+
+.ti 0
+2.2.1 Structures
+
+Structures are unordered collections of name/value pairs. The names are
+symbol tokens, and the values are unrestricted. Each name/value pair is
+called a field.
+
+When two fields in the same struct have the same name we say there are
+"repeated names" or (somewhat misleadingly) "repeated fields".
+Implementations must preserve all such fields, i.e., they may not
+discard fields that have repeated names. However, implementations may
+reorder fields (the binary format identifies structs that are sorted by
+symbolID), so certain operations may lead to nondeterministic behavior.
+
+Note that field names are symbol tokens, not symbol values, and thus may
+not be annotated. The value of a field may be annotated like any
+other value.
+
+.ti 0
+2.2.2 Lists
+
+Lists are ordered collections of values. The contents of the list are
+heterogeneous (that is, each element can have a different type).
+Homogeneous lists are not supported by the core type system, but may be
+imposed by schema validation tools.
+
+.ti 0
+2.2.3 S-Expressions
+
+An S-expression (or symbolic expression) is much like a list in that
+it's an ordered collection of values. However, the notation aligns with
+Lisp syntax to connote use of application semantics like function calls
+or programming-language statements. As such, correct interpretation
+requires a higher-level context other than the raw Ion parser and
+data model.
+
+Ion does not define the interpretation of S-expressions or any semantics
+beyond the pure sequence-of-values data model.
+
+.ti 0
+2.2.4 Type Annotations
+
+Any Ion value can include one or more annotation symbols denoting the
+semantics of the content. This can be used to:
+
+.in 9
+.ti 6
+o Annotate individual values with schema types, for validation purposes.
+
+.ti 6
+o Associate a higher-level datatype (e.g. a Java class) during
+serialization processes.
+
+.ti 6
+o Indicate the notation used within a blob or clob value.
+
+.ti 6
+o Apply other application semantics to a single value.
+
+.in 3
+When multiple annotations are present, the Ion processor will maintain
+their order. Duplicate annotation symbols are allowed but discouraged.
+
+Except for a small number of predefined system annotations, Ion itself
+neither defines nor validates such annotations; that behavior is left to
+applications or tools (such as schema validators).
+
+It's important to understand that annotations are symbol tokens, not
+symbol values. That means they do not have annotations themselves.
+
+.ti 0
+2.3 Value Streams
+
+A value stream is a (potentially unbounded) sequence of Ion values in
+either text or binary.
+

@@ -1,0 +1,543 @@
+.ti 0
+3. Ion Text Encoding
+
+TODO: provide a preamble about text encoding
+
+The ion text encoding is a value stream which must be a valid sequence
+of Unicode code points in any of the three encoding forms (i.e. UTF-8,
+UTF-16, or UTF-32).
+
+.ti 0
+3.1.1 Nulls
+
+The null type has a single value, denoted in the text format by the
+keyword `null'. Null values for all core types are denoted by suffixing
+the keyword with a period and the desired type. Thus we can enumerate
+all possible null values as follows:
+
+.nf
+   null
+   null.null       // Identical to unadorned null
+   null.bool
+   null.int
+   null.float
+   null.decimal
+   null.timestamp
+   null.string
+   null.symbol
+   null.blob
+   null.clob
+   null.struct
+   null.list
+   null.sexp
+
+.in 3
+The text format treats all of these as reserved tokens; to use those same characters as a symbol, they must be enclosed in single-quotes:
+
+.nf
+   null        // The type is null
+   'null'      // The type is symbol
+   null.list   // The type is list
+   'null.int'  // The type is symbol
+
+(As a historical aside, the null type exists primarily for compatibility with JSON, which has only the untyped null value.)
+
+
+.ti 0
+3.1.1 Booleans
+
+The bool type is self-explanatory, but note that (as with all Ion types)
+there's a null value. Thus the set of all Boolean values consists of the
+following three reserved tokens:
+
+.nf
+   null.bool
+   true
+   false
+
+.in 3
+
+(As with the null values, one can single-quote those tokens to force
+them to be parsed as symbols.)
+
+.ti 0
+3.1.1 Integers
+
+The text format allows hexadecimal and binary (but not octal) notation,
+but such notation will not be maintained during binary-to-text
+conversions. It also allows for the use of underscores to
+separate digits.
+
+.nf
+   null.int   // A null int value
+   0          // Zero.  Surprise!
+   -0         //   ...the same value with a minus sign
+   123        // A normal int
+   -123       // Another negative int
+   0xBeef     // An int denoted in hexadecimal
+   0b0101     // An int denoted in binary
+   1_2_3      // An int with underscores
+   0xFA_CE    // An int denoted in hexadecimal with underscores
+   0b10_10_10 // An int denoted in binary with underscores
+
+   +1         // ERROR: leading plus not allowed
+   0123       // ERROR: leading zeros not allowed (no support for
+              //        octal notation)
+   1_         // ERROR: trailing underscore not allowed
+   1__2       // ERROR: consecutive underscores not allowed
+   0x_12      // ERROR: underscore can only appear between digits (the
+              //        radix prefix is not a digit)
+   _1         // A symbol (ints cannot start with underscores)
+
+.in 3
+
+In the text notation, integer values must be followed by one of the
+thirteen numeric stop-characters: {}[](),\\"\\'\\ \\t\\n\\r.
+
+.ti 0
+2.1.1 Floats
+
+In the text format, float values are denoted much like the decimal
+formats in C or Java. As with JSON, extra leading zeros are not allowed.
+Digits may be separated with an underscore.
+
+.nf
+   null.float        // A null float value
+   
+   -0.12e4           // Type is float
+   
+   0E0               // Zero as float
+   -0e0              // Negative zero float   (distinct from positive zero)
+
+.in 3
+The float type denotes either 32-bit or 64-bit IEEE-754 floating-point
+values; other sizes may be supported in future versions of
+this specification.
+
+In the text notation, real values must be followed by one of the
+thirteen numeric stop-characters: {}[](),\\"\\'\\ \\t\\n\\r.
+
+Because most decimal values cannot be represented exactly in binary
+floating-point, float values may change “appearance” and precision when
+reading or writing Ion text.
+
+.ti 0
+2.1.1 Decimals
+
+In the text format, decimal values use d instead of e to start the
+exponent. Reals without an exponent are treated as decimal. As with
+JSON, extra leading zeros are not allowed. Digits may be separated with
+an underscore.
+
+.nf
+   null.decimal      // A null decimal value
+   
+   0.123             // Type is decimal
+   -0.12d4           // Type is decimal
+   
+   0D0               // Zero as decimal
+   0.                //   ...the same value with different notation
+   -0d0              // Negative zero decimal (distinct from positive zero)
+   -0.               //   ...the same value with different notation
+   -0d-1             // Decimal maintains precision: -0. != -0.0
+   
+   123_456.789_012   // Decimal with underscores
+   
+   123_._456         // ERROR: underscores may not appear next to the decimal point
+   12__34.56         // ERROR: consecutive underscores not allowed
+   123.456_          // ERROR: trailing underscore not allowed
+   -_123.456         // ERROR: underscore after negative sign not allowed
+   _123.456          // ERROR: the symbol '_123' followed by an unexpected dot
+
+.in 3
+The precision of decimal values, including trailing zeros, is
+significant and is preserved through round-trips.
+
+.ti 0
+2.1.1 Timestamps
+
+In the text format, timestamps follow the W3C note on date and time
+formats, but they must end with the literal "T" if not at least
+whole-day precision. Fractional seconds are allowed, with at least one
+digit of precision and an unlimited maximum. Local-time offsets may be
+represented as either hour:minute offsets from UTC, or as the literal
+"Z" to denote a local time of UTC. They are required on timestamps with
+time and are not allowed on date values.
+
+Ion follows the "Unknown Local Offset Convention" of [RFC3339]:
+
+.in 6
+If the time in UTC is known, but the offset to local time is unknown,
+this can be represented with an offset of "-00:00". This differs
+semantically from an offset of "Z" or "+00:00", which imply that UTC is
+the preferred reference point for the specified time. RFC2822 describes
+a similar convention for email.
+
+.in 3
+
+Values that are precise only to the year, month, or date are assumed to
+be UTC values with unknown local offset.
+
+.nf
+   null.timestamp                 // A null timestamp value
+   
+   2007-02-23T12:14Z              // Seconds are optional, but local
+                                  // offset is not
+   2007-02-23T12:14:33.079-08:00  // A timestamp with millisecond
+                                  // precision and PST local time
+   2007-02-23T20:14:33.079Z       // The same instant in UTC ("zero"
+                                  // or "Zulu")
+   2007-02-23T20:14:33.079+00:00  // The same instant, with explicit
+                                  // local offset
+   2007-02-23T20:14:33.079-00:00  // The same instant, with unknown
+                                  // local offset
+   
+   2007-01-01T00:00-00:00         // Happy New Year in UTC, unknown local offset
+   2007-01-01                     // The same instant, with days precision, unknown local offset
+   2007-01-01T                    // The same value, different syntax.
+   2007-01T                       // The same instant, with months precision, unknown local offset
+   2007T                          // The same instant, with years precision, unknown local offset
+   
+   2007-02-23                     // A day, unknown local offset 
+   2007-02-23T00:00Z              // The same instant, but more precise and in UTC
+   2007-02-23T00:00+00:00         // An equivalent format for the same value
+   2007-02-23T00:00:00-00:00      // The same instant, with seconds precision
+   
+   2007                           // Not a timestamp, but an int
+   2007-01                        // ERROR: Must end with 'T' if not
+                                  // whole-day precision, this results
+                                  // as an invalid-numeric-stopper error
+   2007-02-23T20:14:33.Z          // ERROR: Must have at least one digit precision after decimal point.
+
+.in 3
+Zero and negative dates are not valid, so the earliest instant in time
+that can be represented as a timestamp is Jan 01, 0001. As per the W3C
+note, leap seconds cannot be represented.
+   
+Two timestamps are only equivalent if they represent the same instant
+with the same offset and precision. This means that the following are
+not equivalent:
+  
+.nf
+   2000T                          // January 1st 2000, year precision, unknown local offset
+   2000-01-01T00:00:00Z           // January 1st 2000, second precision, UTC
+   2000-01-01T00:00:00.000Z       // January 1st 2000, millisecond precision, UTC
+   2000-01-01T00:00:00.000-00:00  // January 1st 2000, millisecond precision, negative zero local offset
+
+.in 3
+In the text notation, timestamp values must be followed by one of the
+thirteen numeric stop-characters: {}[](),\\"\\'\\ \\t\\n\\r.
+
+.ti 0
+2.1.1 Strings
+
+In the text format, strings are delimited by double-quotes and follow
+C/Java backslash-escape conventions (see below).
+
+.nf
+   null.string            // A null string value
+   ""                     // An empty string value
+   " my string "          // A normal string
+   "\\""                   // Contains one double-quote character
+   "\\uABCD"               // Contains one Unicode character
+   xml::"<e a='v'>c</e>"  // String with type annotation 'xml'
+.in 3
+
+.ti 0
+2.1.1.x Long Strings
+
+The text format supports an alternate syntax for "long strings",
+including those that break across lines. Sequences bounded by three
+single-quotes (''') can cross multiple lines and still count as a valid,
+single string. In addition, any number of adjacent triple-quoted strings
+are concatenated into a single value. The concatenation happens within
+the Ion text parser and is neither detectable via the data model nor
+applicable to the binary format. Note that comments are always treated
+as whitespace, so concatenation still occurs when a comment falls
+between two long strings.
+
+.nf
+   ( '''hello '''     // Sexp with one element
+     '''world!'''  )
+
+   ("hello world!")   // The exact same sexp value
+
+   // This Ion value is a string containing three newlines. The
+   // serialized form's first newline is escaped into nothingness.
+   '''\\
+   The first line of the string.
+   This is the second line of the string,
+   and this is the third line.
+   '''
+.in 3
+
+.ti 0
+2.1.1.x Escape Characters
+
+The Ion text format supports escape sequences only within quoted strings
+and symbols. Ion supports most of the escape sequences defined by C++,
+Java, and JSON.
+
+The following sequences are allowed:
+
+.nf
+Unicode Code Point    Ion Escape    Meaning
+
+\&U+0000                \\0            NUL
+\&U+0007                \\a            alert BEL
+\&U+0008                \\b            backspace BS
+\&U+0009                \\t            horizontal tab HT
+\&U+000A                \\n            linefeed LF
+\&U+000C                \\f            form feed FF
+\&U+000D                \\r            carriage return CR
+\&U+000B                \\v            vertical tab VT
+\&U+0022                \\"            double quote
+\&U+0027                \\'            single quote
+\&U+003F                \\?            question mark
+\&U+005C                \\\\            backslash
+\&U+002F                \\/            forward slash
+\&nothing               \\NL           escaped NL expands to nothing
+\&U+00HH                \\xHH          2-digit hexadecimal Unicode
+                                    code point
+\&U+HHHH                \\uHHHH        4-digit hexadecimal Unicode
+                                    code point
+\&U+HHHHHHHH            \\UHHHHHHHH    8-digit hexadecimal Unicode
+                                    code point
+.in 3
+
+Any other sequence following a backslash is an error.
+
+Note that Ion does not support the following escape sequences:
+
+.in 9
+.ti 6
+o Java's extended Unicode markers, e.g., "\\uuuXXXX"
+
+.ti 6
+o General octal escape sequences, \\OOO
+
+.in 3
+
+.ti 0
+2.1.1 Symbols
+
+In the text format, symbols are delimited by single-quotes and use the
+same escape characters as [Strings].
+
+A subset of symbols called identifiers can be denoted in text without
+single-quotes. An identifier is a sequence of ASCII letters, digits, or
+the characters $ (dollar sign) or _ (underscore), not starting with
+a digit.
+
+.nf
+    null.symbol  // A null symbol value
+    'myVar2'     // A symbol
+    myVar2       // The same symbol
+    myvar2       // A different symbol
+    'hi ho'      // Symbol requiring quotes
+    '\'ahoy\''   // A symbol with embedded quotes
+    ''           // The empty symbol
+
+.in 3
+Within S-expressions, the rules for unquoted symbols include another set
+of tokens: operators. An operator is an unquoted sequence of one or more
+of the following nineteen ASCII characters: !#%&*+-./;<=>?@^`|~
+Operators and identifiers can be juxtaposed without whitespace:
+
+.nf
+   ( 'x' '+' 'y' )  // S-expression with three symbols
+   ( x + y )        // The same three symbols
+   (x+y)            // The same three symbols
+   (a==b&&c==d)     // S-expression with seven symbols
+
+.in 3
+Note that the data model does not distinguish between identifiers,
+operators, or other symbols, and that – as always – the binary format
+does not retain whitespace.
+
+See Ion Symbols for more details about symbol representations and
+symbol tables.
+
+.ti 0
+2.1.1 Blobs
+
+In the text format, blob values are denoted as [RFC 4648]-compliant
+Base64 text within two pairs of curly braces.
+
+When parsing blob text, an error must be raised if the data:
+
+.in 9
+.ti 6
+o Contains characters outside of the Base64 character set.
+
+.ti 6
+o Contains a padding character (=) anywhere other than at the end.
+
+.ti 6
+o Is terminated by an incorrect number of padding characters.
+
+.in 3
+
+Within blob values, whitespace is ignored and comments are not allowed.
+The / character is always considered part of the Base64 data.
+
+.nf
+    // A null blob value
+    null.blob
+    
+    // A valid blob value with zero padding characters.
+    {{
+      +AB/
+    }}
+    
+    // A valid blob value with one required padding character.
+    {{ VG8gaW5maW5pdHkuLi4gYW5kIGJleW9uZCE= }}
+    
+    // ERROR: Incorrect number of padding characters.
+    {{ VG8gaW5maW5pdHkuLi4gYW5kIGJleW9uZCE== }}
+    
+    // ERROR: Padding character within the data.
+    {{ VG8gaW5maW5pdHku=Li4gYW5kIGJleW9uZCE= }}
+    
+    // A valid blob value with two required padding characters.
+    {{ dHdvIHBhZGRpbmcgY2hhcmFjdGVycw== }}
+    
+    // ERROR: Invalid character within the data.
+    {{ dHdvIHBhZGRpbmc_gY2hhcmFjdGVycw= }}
+
+
+.ti 0
+2.1.1 Clobs
+
+In the text format, clob values use similar syntax to blob, but the data
+between braces must be one string. The string may only contain legal
+7-bit ASCII characters, using the same escaping syntax as string and
+symbol values. This guarantees that the value can be transmitted
+unscathed while remaining generally readable (at least for western
+language text). Like blobs, clobs disallow comments everywhere within
+the value.
+
+[Strings] and [Clobs] gives details on the subtle, but profound,
+differences between Ion strings and clobs.
+
+.nf
+   null.clob  // A null clob value
+   
+   {{ "This is a CLOB of text." }}
+   
+   shift_jis ::
+   {{
+     '''Another clob with user-defined encoding, '''
+     '''this time on multiple lines.'''
+   }}
+   
+   {{
+     // ERROR
+     "comments not allowed"
+   }}
+
+.in 3
+Note that the shift_jis type annotation above is, like all type
+annotations, application-defined. Ion does not interpret or validate
+that symbol; that’s left to the application.
+
+.ti 0
+2.2.1 Structures
+
+In the text format, structures are wrapped by curly braces, with a colon
+between each name and value, and a comma between the fields. For the
+purposes of JSON compatibility, it’s also legal to use strings for field
+names, but they are converted to symbol tokens by the parser.
+
+.nf
+   null.struct                         // A null struct value
+   { }                                 // An empty struct value
+   { first : "Tom" , last: "Riddle" }  // Structure with two fields
+   {"first":"Tom","last":"Riddle"}     // The same value with confusing style
+   {center:{x:1.0, y:12.5}, radius:3}  // Nested struct
+   { x:1, }                            // Trailing comma is legal in Ion (unlike JSON)
+   { "":42 }                           // A struct value containing a field with an empty name
+   { x:1, x:null.int }                 // WARNING: repeated name 'x' leads to undefined behavior
+   { x:1, , }                          // ERROR: missing field between commas
+
+.in 3
+
+Note that field names are symbol tokens, not symbol values, and thus may
+not be annotated. The value of a field may be annotated like any other
+value. Syntactically the field name comes first, then annotations, then
+the content.
+
+.nf 
+   { annotation:: field_name: value }  // ERROR
+   { field_name: annotation:: value }  // Okay
+
+.in 3
+
+.ti 0
+2.2.2 Lists
+
+In the text format, lists are bounded by square brackets and elements
+are separated by commas.
+
+.nf
+   null.list         // A null list value
+   []                // An empty list value
+   [1, 2, 3]         // List of three ints
+   [ 1 , two ]       // List of an int and a symbol
+   [a , [b]]         // Nested list
+   [ 1.2, ]          // Trailing comma is legal in Ion (unlike JSON)
+   [ 1, , 2 ]        // ERROR: missing element between commas
+
+.in 3
+
+.ti 0
+2.2.3 S-Expressions
+
+In the text format, S-expressions are bounded by parentheses.
+S-expressions also allow unquoted operator symbols (in addition to the
+unquoted identifier symbols allowed everywhere), so commas are
+interpreted as values rather than element separators.
+
+.nf
+   null.sexp         // A null S-expression value
+   ()                // An empty expression value
+   (cons 1 2)        // S-expression of three values
+   ([hello][there])  // S-expression containing two lists
+   
+   (a+-b)  ( 'a' '+-' 'b' )    // Equivalent; three symbols
+   (a.b;)  ( 'a' '.' 'b' ';')  // Equivalent; four symbols
+
+.in 3
+Although Ion S-expressions use a syntax similar to Lisp expressions, Ion
+does not define their interpretation or any semantics at all, beyond the
+pure sequence-of-values data model indicated above.
+
+.ti 0
+2.2.4 Type Annotations
+
+In the text format, type annotations are denoted by a non-null symbol
+token and double-colons preceding any content:
+
+.nf
+   int32::12                                // Suggests 32 bits as end-user type
+   'my.custom.type' :: { x : 12 , y : -1 }  // Gives a struct a user-defined type
+   
+   { field: something::'another thing'::value }  // Field's name must precede annotations of its value
+   
+   jpeg :: {{ ... }}                        // Indicates the blob contains jpeg data
+   bool :: null.int                         // A very misleading annotation on the integer null
+   '' :: 1                                  // An empty annotation
+   null.symbol :: 1                         // ERROR: type annotation cannot be null 
+
+.in 3
+Except for a small number of predefined system annotations, Ion itself
+neither defines nor validates such annotations; that behavior is left to
+applications or tools (such as schema validators).
+
+It's important to understand that annotations are symbol tokens, not
+symbol values. That means they do not have annotations themselves. In
+particular, the text `a::c' is a single value consisting of three
+textual tokens (a symbol, a double-colon, and another symbol); the first
+symbol token is an annotation on the value, and the second is the
+content of the value.
+

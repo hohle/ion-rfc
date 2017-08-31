@@ -1,0 +1,57 @@
+.ti 0
+6.  References
+
+.ti 0
+6.1.  Normative References
+
+.in 14
+.ti 3
+[RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+Requirement Levels", BCP 14, RFC 2119, March 1997.
+.\" If you used the keywords, please include RFC 2119 as a normative 
+.\" reference.
+
+.ti 3
+[RFC4234]  Crocker, D. and P. Overell, "Augmented BNF for Syntax
+Specifications: ABNF", RFC 4234, October 2005.
+.\" This is just an example. The reference entries for all RFCs,
+.\" formatted in the style of the RFC Editor are available here:
+.\" ftp://ftp.rfc-editor.org/in-notes/rfc-ref.txt
+
+.ti 0
+6.2.  Informative References
+
+.ti 3
+[2223BIS]  Reynolds, J. and R. Braden, "Instructions to Request for
+Comments (RFC) Authors", draft-rfc-editor-rfc2223bis-08.txt, August 2004.  
+.\" Please include the draft string when referencing drafts.
+.\" Although it will be removed prior to publication, it is helpful
+.\" to the editor for consistency checking.
+
+.in 3
+.ti 0
+Authors' Addresses
+
+.\"  The RFC Editor has always treated the Authors' Addresses section
+.\"  of an RFC as essentially boilerplate: it is required to be
+.\"  the last section before the legal boilerplate and is normally
+.\"  unnumbered.
+.nf
+Jon Postel
+Former Address:
+   USC Information Sciences Institute
+Current Address:
+   Unknown (but we are hopeful)
+EMail: postel@isi.edu (known to be a black hole)
+
+
+RFC Editor
+USC Information Sciences Institute
+4676 Admiralty Way
+Marina del Rey, CA 90292-6695
+
+Tel: 310 448 9369 (Sandy Ginoza)
+Tel: 310 448 9173 (Bob Braden)
+EMail: rfc-editor@rfc-editor.org
+
+

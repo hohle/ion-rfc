@@ -1,0 +1,11 @@
+.ti 0
+3.  Security Considerations
+
+Unlike JSON, Ion is not a subset of an existing programming logic and
+cannot be "eval()"-ed. However, Ion data can represent an application
+specific programming language implemented by a consumer. When viewed as
+a data stream this poses no security risk.
+
+When used to implement a programming language, Ion neither provides nor
+prevents safeguards found in any other programming language.
+

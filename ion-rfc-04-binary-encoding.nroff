@@ -1,0 +1,700 @@
+.ti 0
+4. Ion Binary Encoding
+
+The Ion binary encoding is a compact and efficient value stream. In the
+binary format, a value stream always starts with a binary version marker
+(BVM) that specifies the precise Ion version used to encode the data
+that follows:
+
+.nf
+                          7    0 7     0 7     0 7    0
+                         +------+-------+-------+------+
+   binary version marker | 0xE0 | major | minor | 0xEA |
+                         +------+-------+-------+------+
+
+.in 3
+The four-octet BVM also acts as a "magic cookie" to distinguish Ion
+binary data from other formats, including Ion text data. Its first octet
+(in sequence from the beginning of the stream) is 0xE0 and its fourth
+octet is 0xEA. The second and third octets contain major and minor
+version numbers. The only valid BVM, identifying Ion 1.0, is
+0xE0 0x01 0x00 0xEA.
+
+An Ion value stream starts with a BVM, followed by zero or more values
+which contain the actual data. These values are generally referred to as
+"top-level values".
+
+.nf
+                 31                      0
+                +-------------------------+
+   value stream |  binary version marker  |
+                +-------------------------+
+                :          value          :
+                +=========================+
+                             ⋮
+                +=========================+
+                :  binary version marker  :
+                +=========================+
+                :          value          :
+                +=========================+
+                             ⋮
+
+.in 3
+A value stream can contain other, perhaps different, BVMs interspersed
+with the top-level values. Each BVM resets the decoder to the
+appropriate initial state for the given version of Ion. This allows the
+stream to be constructed by concatenating data from different sources,
+without requiring transcoding to a single version of the format.
+
+Note: The BVM is not a value and should not be visible to or manipulable
+by the user; it is internal data managed by and for the
+Ion implementation.
+
+.ti 0
+4.1 Basic Field Formats
+
+Binary-encoded Ion values are comprised of one or more fields, and the
+fields use a small number of basic formats (separate from the Ion types
+visible to users).
+
+4.1.1 UInt and Int Fields
+
+UInt and Int fields represent fixed-length unsigned and signed integer
+values. These field formats are always used in some context that clearly
+indicates the number of octets in the field.
+
+.nf
+               7                       0
+              +-------------------------+
+   UInt field |          bits           |
+              +-------------------------+
+              :          bits           :
+              +=========================+
+                          ⋮
+              +=========================+
+              :          bits           :
+              +=========================+
+               n+7                     n
+
+.in 3
+UInts are sequences of octets, interpreted as big-endian.
+
+.nf
+                7  6                   0
+              +---+---------------------+
+   Int field  |   |      bits           |
+              +---+---------------------+
+                ^
+                |
+                +--sign
+              +=========================+
+              :          bits           :
+              +=========================+
+                          ⋮
+              +=========================+
+              :          bits           :
+              +=========================+
+               n+7                     n
+
+.in 3
+Ints are sequences of octets, interpreted as sign-and-magnitude big
+endian integers (with the sign on the highest-order bit of the first
+octet). This means that the representations of 123456 and -123456 should
+only differ in their sign bit. (See
+http://en.wikipedia.org/wiki/Signed_number_representation for more
+info.)
+
+.ti 0
+4.1.2 VarUInt and VarInt Fields
+
+VarUInt and VarInt fields represent self-delimiting, variable-length
+unsigned and signed integer values. These field formats are always used
+in a context that does not indicate the number of octets in the field;
+the last octet (and only the last octet) has its high-order bit set to
+terminate the field.
+
+.nf 
+                   7  6                   0      
+                 +===+=====================+     
+   VarUInt field : 0 :         bits        :
+                 +===+=====================+     
+                             ⋮
+                  n+7 n+6                 n
+                 +---+---------------------+
+                 | 1 |         bits        |
+                 +---+---------------------+
+
+.in 3 
+VarUInts are a sequence of octets. The high-order bit of the last octet
+is one, indicating the end of the sequence. All other high-order bits
+must be zero.
+
+.nf
+                  7   6  5               0       n+7 n+6                 n
+                +===+                           +---+
+   VarInt field : 0 :       payload          …  | 1 |       payload
+                +===+                           +---+
+                    +---+-----------------+         +=====================+
+                    |   |   magnitude     |  …      :       magnitude     :
+                    +---+-----------------+         +=====================+
+                  ^   ^                           ^
+                  |   |                           |
+                  |   +--sign                     +--end flag
+                  +--end flag
+
+.in 3
+VarInts are sign-and-magnitude integers, like Ints. Their layout is
+complicated, as there is one special leading bit (the sign) and one
+special trailing bit (the terminator). In the above diagram, we put the
+two concepts on different layers.
+
+The high-order bit in the top layer is an end-of-sequence marker. It
+must be set on the last octet in the representation and clear in all
+other octets. The second-highest order bit (0x40) is a sign flag in the
+first octet of the representation, but part of the extension bits for
+all other octets. For single-octet VarInt values, this collapses
+down to:
+
+.nf
+                               7   6  5           0
+                             +---+---+-------------+
+   single octet VarInt field | 1 |   |  magnitude  |
+                             +---+---+-------------+
+                                   ^
+                                   |
+                                   +--sign
+
+
+.ti 0
+4.2 Typed Value Formats
+
+A value consists of a one-octet type descriptor, possibly followed by a
+length in octets, possibly followed by a representation.
+
+.nf
+          7       4 3       0
+         +---------+---------+
+   value |    T    |    L    |
+         +---------+---------+======+
+         :     length [VarUInt]     :
+         +==========================+
+         :      representation      :
+         +==========================+
+
+.in 3
+The type descriptor octet has two subfields: a four-bit type code T, and
+a four-bit length L.
+
+Each value of T identifies the format of the representation, and
+generally (though not always) identifies an Ion datatype. Each type code
+T defines the semantics of its length field L as described below.
+
+The length value – the number of octets in the representation field(s) –
+is encoded in L and/or length fields, depending on the magnitude and on
+some particulars of the actual type. The length field is empty (taking
+up no octets in the message) if we can store the length value inside L
+itself. If the length field is not empty, then it is a single VarUInt
+field. The representation may also be empty (no octets) in some cases,
+as detailed below.
+
+Unless otherwise defined, the length of the representation is encoded
+as follows:
+
+.in 9
+.ti 6
+o If the value is null (for that type), then L is set to 15.
+
+.ti 6
+o If the representation is less than 14 bytes long, then L is set to the
+length, and the length field is omitted.
+
+.ti 6
+o If the representation is at least 14 bytes long, then L is set to 14,
+and the length field is set to the representation length, encoded as a
+VarUInt field.
+
+.ti 0
+4.2.1 0 Nulls
+
+.nf
+              7       4 3       0
+              +---------+---------+
+   Null value |    0    |    15   |
+              +---------+---------+
+
+.in 3
+Values of type null always have empty lengths and representations. The only valid L value is 15, representing the only value of this type, null.null.
+
+4.2.1.1 NOP Padding
+
+.nf
+            7       4 3       0
+           +---------+---------+
+   NOP Pad |    0    |    L    |
+           +---------+---------+======+
+           :     length [VarUInt]     :
+           +--------------------------+
+           |      ignored octets      |
+           +--------------------------+
+
+.in 3
+In addition to null.null, the null type code is used to encode padding that has no operation (NOP padding). This can be used for “binary whitespace” when alignment of octet boundaries is needed or to support in-place editing. Such encodings are not considered values and are ignored by the processor.
+
+In this encoding, L specifies the number of octets that should be ignored.
+
+The following is a single byte NOP pad. The NOP padding typedesc bytes are counted as padding:
+
+.nf
+   0x00
+
+.in 3
+The following is a two byte NOP pad:
+
+.nf
+   0x01 0xFE
+
+.in 3
+Note that the single byte of “payload” 0xFE is arbitrary and ignored by the parser.
+
+The following is a 16 byte NOP pad:
+
+.nf
+   0x0E 0x8E 0x00 ... <12 arbitrary octets> ... 0x00
+
+.in 3
+NOP padding is valid anywhere a value can be encoded, except for within an annotation wrapper. NOP padding in struct requires additional encoding considerations.
+
+.ti 0
+2.1.2 1 Booleans
+
+.nf
+               7       4 3       0
+              +---------+---------+
+   Bool value |    1    |   rep   |
+              +---------+---------+
+
+.in 3
+Values of type bool always have empty lengths, and their representation is stored in the typedesc itself (rather than after the typedesc). A representation of 0 means false; a representation of 1 means true; and a representation of 15 means null.bool.
+
+.ti 0
+2.1.3 2 & 3 Integers
+
+Values of type int are stored using two type codes: 2 for positive values and 3 for negative values. Both codes use a UInt subfield to store the magnitude.
+
+.nf
+              7       4 3       0
+             +---------+---------+
+   Int value |  2 or 3 |    L    |
+             +---------+---------+======+
+             :     length [VarUInt]     :
+             +==========================+
+             :     magnitude [UInt]     :
+             +==========================+
+
+.in 3
+Zero is always stored as positive; negative zero is illegal.
+
+If the value is zero then T must be 2, L is zero, and there are no length or magnitude subfields. As a result, when T is 3, both L and the magnitude subfield must be non-zero.
+
+With either type code 2 or 3, if L is 15, then the value is null.int and the magnitude is empty. Note that this implies there are two equivalent binary representations of null integer values.
+
+.ti 0
+2.1.4 4 Floats
+
+.nf
+                 7       4 3       0
+               +---------+---------+
+   Float value |    4    |    L    |
+               +---------+---------+-----------+
+               |   representation [IEEE-754]   |
+               +-------------------------------+
+
+Floats are encoded as big endian octets of their IEEE 754 bit patterns.
+
+The L field of floats encodes the size of the IEEE-754 value.
+
+.in 9
+.ti 6
+o If L is 4, then the representation is 32 bits (4 octets).
+.ti 6
+
+o If L is 8, then the representation is 64 bits (8 octets).
+
+.in 3
+There are two exceptions for the L field:
+ 
+.in 9
+.ti 6
+o If L is 0, then the the value is 0e0 and representation is empty.
+  Note: this is not to be confused with -0e0 which is a distinct value and in current Ion must be encoded as a normal IEEE float bit pattern.
+
+.ti 6
+o  If L is 15, then the value is null.float and the representation is empty.
+   Note: Ion 1.0 only supports 32-bit and 64-bit float values (i.e. L size 4 or 8), but future versions of the standard may support 16-bit and 128-bit float values.
+
+.in 3
+
+.ti 0
+2.1.5 5 Decimals
+
+.nf
+                  7       4 3       0
+                 +---------+---------+
+   Decimal value |    5    |    L    |
+                 +---------+---------+======+
+                 :     length [VarUInt]     :
+                 +--------------------------+
+                 |    exponent [VarInt]     |
+                 +--------------------------+
+                 |    coefficient [Int]     |
+                 +--------------------------+
+
+.in 3
+Decimal representations have two components: exponent (a VarInt) and coefficient (an Int). The decimal’s value is coefficient * 10 ^ exponent.
+
+The length of the coefficient subfield is the total length of the representation minus the length of exponent. The subfield should not be present (that is, it has zero length) when the coefficient’s value is (positive) zero.
+
+If the value is 0. (aka 0d0) then L is zero, there are no length or representation fields, and the entire value is encoded as the single byte 0x50.
+
+.ti 0
+2.1.6 6 Timestamps
+
+.nf
+                    7       4 3       0
+                   +---------+---------+
+   Timestamp value |    6    |    L    |
+                   +---------+---------+========+
+                   :      length [VarUInt]      :
+                   +----------------------------+
+                   |      offset [VarInt]       |
+                   +----------------------------+
+                   |       year [VarUInt]       |
+                   +----------------------------+
+                   :       month [VarUInt]      :
+                   +============================+
+                   :         day [VarUInt]      :
+                   +============================+
+                   :        hour [VarUInt]      :
+                   +====                    ====+
+                   :      minute [VarUInt]      :
+                   +============================+
+                   :      second [VarUInt]      :
+                   +============================+
+                   : fraction_exponent [VarInt] :
+                   +============================+
+                   : fraction_coefficient [Int] :
+                   +============================+
+
+.in 3
+Timestamp representations have 7 components, where 5 of these components are optional depending on the precision of the timestamp. The 2 non-optional components are offset and year. The 5 optional components are (from least precise to most precise): month, day, hour and minute, second, fraction_exponent and fraction_coefficient. All of these 7 components are in Universal Coordinated Time (UTC).
+
+The offset denotes the local-offset portion of the timestamp, in minutes difference from UTC.
+
+The hour and minute is considered as a single component, that is, it is illegal to have hour but not minute (and vice versa).
+
+The fraction_exponent and fraction_coefficient denote the fractional seconds of the timestamp as a decimal value. The fractional seconds’ value is coefficient * 10 ^ exponent. It must be greater than or equal to zero and less than 1. A missing coefficient defaults to zero. Fractions whose coefficient is zero and exponent is greater than -1 are ignored. The following hex encoded timestamps are equivalent:
+
+.nf
+   68 80 0F D0 81 81 80 80 80       // 2000-01-01T00:00:00Z with no fractional seconds
+   69 80 0F D0 81 81 80 80 80 80    // The same instant with 0d0 fractional seconds and implicit zero coefficient
+   6A 80 0F D0 81 81 80 80 80 80 00 // The same instant with 0d0 fractional seconds and explicit zero coefficient
+   69 80 0F D0 81 81 80 80 80 C0    // The same instant with 0d-0 fractional seconds
+   69 80 0F D0 81 81 80 80 80 81    // The same instant with 0d1 fractional seconds
+
+.in 3
+Conversely, none of the following are equivalent:
+
+.nf
+   68 80 0F D0 81 81 80 80 80       // 2000-01-01T00:00:00Z with no fractional seconds
+   69 80 0F D0 81 81 80 80 80 C1    // 2000-01-01T00:00:00.0Z
+   69 80 0F D0 81 81 80 80 80 C2    // 2000-01-01T00:00:00.00Z
+
+.in 3
+If a timestamp representation has a component of a certain precision, each of the less precise components must also be present or else the representation is illegal. For example, a timestamp representation that has a fraction_exponent and fraction_coefficient component but not the month component, is illegal.
+
+Note: The component values in the binary encoding are always in UTC, while components in the text encoding are in the local time! This means that transcoding requires a conversion between UTC and local time.
+
+.ti 0
+2.1.7 7 Symbols
+
+.nf
+                 7       4 3       0
+                +---------+---------+
+   Symbol value |    7    |    L    |
+                +---------+---------+======+
+                :     length [VarUInt]     :
+                +--------------------------+
+                |     symbol ID [UInt]     |
+                +--------------------------+
+
+.in 3
+In the binary encoding, all Ion symbols are stored as integer symbol IDs whose text values are provided by a symbol table. If L is zero then the symbol ID is zero and the length and symbol ID fields are omitted.
+
+See Ion Symbols for more details about symbol representations and symbol tables
+
+.ti 0
+2.1.8 8 Strings
+
+.nf
+                 7       4 3       0
+                +---------+---------+
+   String value |    8    |    L    |
+                +---------+---------+======+
+                :     length [VarUInt]     :
+                +==========================+
+                :  representation [UTF8]   :
+                +==========================+
+
+.in 3
+These are always sequences of Unicode characters, encoded as a sequence of UTF-8 octets.
+
+.ti 0
+2.1.9 9 Clobs
+
+.nf
+               7       4 3       0
+              +---------+---------+
+   Clob value |    9    |    L    |
+              +---------+---------+======+
+              :     length [VarUInt]     :
+              +==========================+
+              :       data [Bytes]       :
+              +==========================+
+
+.in 3
+Values of type clob are encoded as a sequence of octets that should be interpreted as text with an unknown encoding (and thus opaque to the application).
+
+Zero-length clobs are legal, so L may be zero.
+
+.ti 0
+2.1.10 0xaL: Blobs
+
+.nf
+               7       4 3       0
+              +---------+---------+
+   Blob value |   10    |    L    |
+              +---------+---------+======+
+              :     length [VarUInt]     :
+              +==========================+
+              :       data [Bytes]       :
+              +==========================+
+
+.nf
+This is a sequence of octets with no interpretation (and thus opaque to the application).
+
+Zero-length blobs are legal, so L may be zero.
+
+.ti 0
+2.2.11 0xbL: Lists
+
+.nf
+               7       4 3       0
+              +---------+---------+
+   List value |   11    |    L    |
+              +---------+---------+======+
+              :     length [VarUInt]     :
+              +==========================+
+              :           value          :
+              +==========================+
+                         ⋮
+
+.in 3
+The representation fields of a list value are simply nested Ion values.
+
+When L is 15, the value is null.list and there’s no length or nested values. When L is 0, the value is an empty list, and there’s no length or nested values.
+
+Because values indicate their total lengths in octets, it is possible to locate the beginning of each successive value in constant time.
+
+.ti 0
+2.2.12 0xcL: S-Expressions
+
+.nf
+               7       4 3       0
+              +---------+---------+
+   Sexp value |   12    |    L    |
+              +---------+---------+======+
+              :     length [VarUInt]     :
+              +==========================+
+              :           value          :
+              +==========================+
+                            ⋮
+
+.in 3
+Values of type sexp are encoded exactly as are list values, except with a different type code.
+
+.ti 0
+2.2.13 0xdL: Structures
+
+Structs are encoded as sequences of symbol/value pairs. Since all symbols are encoded as positive integers, we can omit the typedesc on the field names and just encode the integer value.
+
+.nf
+                 7       4 3       0
+                +---------+---------+
+   Struct value |   13    |    L    |
+                +---------+---------+======+
+                :     length [VarUInt]     :
+                +======================+===+==================+
+                : field name [VarUInt] :        value         :
+                +======================+======================+
+                            ⋮                     ⋮
+
+.in 3
+Binary-encoded structs support a special case where the fields are known to be sorted such that the field-name integers are increasing. This state exists when L is one. Thus:
+
+.in 9
+.ti 6
+o When L is 0, the value is an empty struct, and there’s no length or nested fields.
+
+.ti 6
+o When L is 1, the struct has at least one symbol/value pair, the length field exists, and the field name integers are sorted in increasing order.
+
+.ti 6
+o When L is 15, the value is null.struct, and there’s no length or nested fields.
+
+.ti 6
+o When 1 < L < 14 then there is no length field as L is enough to represent the struct size, and no assertion is made about field ordering.
+
+.ti 6
+o Otherwise, the length field exists, and no assertion is made about field ordering.
+
+.in 3
+Note: Because VarUInts depend on end tags to indicate their lengths, finding the succeeding value requires parsing the field name prefix. However, VarUInts are a more compact representation than Int values.
+
+.ti 0
+5.2.13.1 NOP Padding in struct Fields
+
+NOP Padding in struct values requires additional consideration of the field name element. If the “value” of a struct field is the NOP pad, then the field name is ignored. This means that it is not possible to encode padding in a struct value that is less than two bytes.
+
+Implementations should use symbol ID zero as the field name to emphasize the lack of meaning of the field name. For more general details about the semantics of symbol ID zero, refer to Ion Symbols.
+
+For example, consider the following empty struct with three bytes of padding:
+
+.nf
+   0xD3 0x80 0x01 0xAC
+
+.in 3
+In the above example, the struct declares that it is three bytes large, and the encoding of the pair of symbol ID zero followed by a pad that is two bytes large (note the last octet 0xAC is completely arbitrary and never interpreted by an implementation).
+
+The following is an example of struct with a single field with four total bytes of padding:
+
+.nf
+   0xD7 0x84 0x81 "a" 0x80 0x02 0x01 0x02
+
+.in 3
+The above is equivalent to {name:"a"}.
+
+The following is also a empty struct, with a two byte pad:
+
+.nf
+   0xD2 0x8F 0x00
+
+.in 3
+In the above example, the field name of symbol ID 15 is ignored (regardless of if it is a valid symbol ID).
+
+The following is malformed because there is an annotation “wrapping” a NOP pad, which is not allowed generally for annotations:
+
+.nf
+   // {$0:name::<NOP>}
+   0xD5 0x80 0xE3 0x81 0x84 0x00
+
+.in 3
+
+.ti 0
+4.2.14 0xeL: Type Annotations
+
+This special type code doesn't map to an Ion value type, but instead is
+a wrapper used to associate annotations with content.
+
+Annotations are a special type that wrap content identified by the other
+type codes. The annotations themselves are encoded as integer
+symbol IDs.
+
+.nf
+                       7       4 3       0
+                      +---------+---------+
+   Annotation wrapper |   14    |    L    |
+                      +---------+---------+======+
+                      :     length [VarUInt]     :
+                      +--------------------------+
+                      |  annot_length [VarUInt]  |
+                      +--------------------------+
+                      |      annot [VarUInt]     |  …
+                      +--------------------------+
+                      |          value           |
+                      +--------------------------+
+
+.in 3
+The length field L field indicates the length from the beginning of the
+annot_length field to the end of the enclosed value. Because at least
+one annotation and exactly one content field must exist, L is at least 3
+and is never 15.
+
+The annot_length field contains the length of the (one or more)
+annot fields.
+
+It is illegal for an annotation to wrap another annotation atomically,
+i.e., annotation(annotation(value)). However, it is legal to have an
+annotation on a container that holds annotated values. Note that it is
+possible to enforce the illegality of annotation(annotation(value))
+directly in a grammar, but we have not chosen to do that in
+this document.
+
+Furthermore, it is illegal for an annotation to wrap a NOP Pad since
+this encoding is not an Ion value. Thus, the following sequence
+is malformed:
+
+.nf
+   0xE3 0x81 0x84 0x00
+
+.in 3
+Note: Because L cannot be zero, the octet 0xE0 is not a valid type
+descriptor. Instead, that octet signals the start of a binary
+version marker.
+
+.ti 0
+4.2.15 0xfL: Reserved
+
+The remaining type code, 15, is reserved for future use and is not legal
+in Ion 1.0 data.
+
+.ti 0
+4.3 Illegal Type Descriptors
+
+The preceding sections define valid type descriptor octets, composed of
+a type code (T) in the upper four bits and a length field (L) in the
+lower four bits. As mentioned, many possible combinations are illegal
+and must cause parsing errors.
+
+The following table enumerates the illegal type descriptors in Ion
+1.0 data.
+
+.nf
+   T   L                    Reason
+
+   1   [3-14]               For bool values, L is used to encode the
+                            value, and may be 0 (false), 1 (true), or 15
+                            (null.bool).
+
+   3   [0]                  The int 0 is always stored with type code 2.
+                            Thus, type code 3 with L equal to zero
+                            is illegal.
+
+   4   [1-3],[5-7],[9-14]   For float values, only 32-bit and 64-bit
+                            IEEE-754 values are supported. Additionally,
+                            0e0 and null.float are represented with L
+                            equal to 0 and 15, respectively.
+
+   14  [0]*,[1-2],[15]      Annotation wrappers must have one
+                            annot_length field, at least one annot
+                            field, and exactly one value field. Null
+                            annotation wrappers are illegal.
+
+                            Note: Since 0xE0 signals the start of the
+                            BVM, encountering this octet where a type
+                            descriptor is expected should only cause
+                            parsing errors when it is not followed by
+                            the rest of the BVM octet sequence.
+
+   15  [0-15]               The type code 15 is illegal in Ion 1.0 data.
+.in 3
+

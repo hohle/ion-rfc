@@ -1,0 +1,12 @@
+.ti 0
+Abstract          \"  See: "Instructions to RFC Authors [RFC2223BIS]"
+
+Ion is a set of datatypes as well as a text and binary, language
+independent data interchange format designed for use within
+applications as well as both an on-wire and at rest encoding. The
+datatypes and text encoding are a superset of the JSON format. Along
+with these additions is an isomorphic, space-efficient binary encoding.
+
+This document specifies the Ion datatypes, the grammar of the text
+representation, and encoding of the binary representation.
+
