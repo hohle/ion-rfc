@@ -1,5 +1,6 @@
+.tm 2. The Ion Data Model ............................................. \n%
 .ti 0
-2. The Ion Data Model ..............................................2
+2. The Ion Data Model
 
 The semantic basis of Ion is an abstract data model, composed of a set
 of primitive types and a set of recursively-defined container types. All
@@ -54,14 +55,16 @@ o sexp - Ordered collections of values with application-defined
       semantics
 
 .in 3
+.tm _   2.1. Primitive Types .......................................... \n%
 .ti 0
-2.1. Primitive Types ............................................2
+2.1. Primitive Types 
 
 The Ion primitive types represent scalar values including nulls,
 booleans, numbers, timestamps, character sequences, and symbols.
 
+.tm _      2.1.1. Null Values ....................................... \n%
 .ti 0
-2.1.1 Null Values ............................................4
+2.1.1 Null Values
 
 Ion supports distinct null values for every core type, as well as a
 separate null type that's distinct from all other types.
@@ -72,31 +75,36 @@ type has a single value, null.
 As a historical aside, the null type exists primarily for compatibility
 with JSON, which has only the untyped null value.
 
+.tm _      2.1.2. Boolean ......................................... \n%
 .ti 0
-2.1.1 Booleans ...............................................4
+2.1.2 Booleans
 
 The bool type may have a value of true, false, or, null.
 
+.tm _       2.1.3. Integers ......................................... \n%
 .ti 0
-2.1.1 Integers ...............................................4
+2.1.3 Integers
 
 The int type consists of signed integers of arbitrary size.
 
+.tm _       2.1.4. Real Numbers ......................................... \n%
 .ti 0
-2.1.1 Real Numbers ...........................................4
+2.1.4 Real Numbers ...........................................4
 
 Ion supports both binary and lossless decimal encodings of real numbers
 as, respectively, types float and decimal.
 
+.tm _       2.1.4.1. Float ......................................... \n%
 .ti 0
-2.1.1.1 Float
+2.1.4.1 Float
 
 The float type denotes either 32-bit or 64-bit IEEE-754 floating-point
 values; other sizes may be supported in future versions of this
 specification.
 
+.tm _       2.1.4.2. Decimal ......................................... \n%
 .ti 0
-2.1.1.2 Decimal
+2.1.4.2 Decimal
 
 Because most decimal values cannot be represented exactly in binary
 floating-point, float values may change "appearance" and precision when
@@ -104,8 +112,9 @@ being read or written. The decimal type, however, has significant
 precision, including trailing zeros and is preserved through
 round-trips.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
-2.1.1 Timestamps .............................................4
+2.1.5 Timestamps
 
 Timestamps represent a specific moment in time, always include a local
 offset, and are capable of arbitrary precision.
@@ -121,11 +130,13 @@ note, leap seconds cannot be represented.
 Two timestamps are only equivalent if they represent the same instant
 with the same offset and precision.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.1.1 Strings ................................................4
 
 Ion string values are Unicode character sequences of arbitrary length.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.1.1 Symbols ................................................4
 
@@ -139,9 +150,7 @@ separately from data at rest using symbol tables.
 
 TODO: differentiate symbol from symbol token
 
-.ti 0
-2.2.2 Ion Version Markers
-
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.1.1 Blobs
 
@@ -149,6 +158,7 @@ The blob type allows embedding of arbitrary raw binary data. Ion treats
 such data as a single (though often very large) value. It does no
 processing of such data other than passing it through intact.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.1.1 Clobs
 
@@ -158,6 +168,7 @@ blobs, clobs are a sequence of raw octets that are not given any special
 interpretation. This guarantees that the value can be transmitted
 without modification.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.2. Container Types
 
@@ -165,6 +176,7 @@ Ion defines three container types: structures, lists, and S-expressions.
 These types are defined recursively and may contain values of any
 Ion type.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.2.1 Structures
 
@@ -183,6 +195,7 @@ Note that field names are symbol tokens, not symbol values, and thus may
 not be annotated. The value of a field may be annotated like any
 other value.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.2.2 Lists
 
@@ -191,6 +204,7 @@ heterogeneous (that is, each element can have a different type).
 Homogeneous lists are not supported by the core type system, but may be
 imposed by schema validation tools.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.2.3 S-Expressions
 
@@ -204,6 +218,7 @@ data model.
 Ion does not define the interpretation of S-expressions or any semantics
 beyond the pure sequence-of-values data model.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.2.4 Type Annotations
 
@@ -235,6 +250,7 @@ applications or tools (such as schema validators).
 It's important to understand that annotations are symbol tokens, not
 symbol values. That means they do not have annotations themselves.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.3 Value Streams
 

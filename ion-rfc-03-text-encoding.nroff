@@ -1,3 +1,4 @@
+.tm 3. Text Encoding ......................................... \n%
 .ti 0
 3. Ion Text Encoding
 
@@ -7,6 +8,7 @@ The ion text encoding is a value stream which must be a valid sequence
 of Unicode code points in any of the three encoding forms (i.e. UTF-8,
 UTF-16, or UTF-32).
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 3.1.1 Nulls
 
@@ -43,6 +45,7 @@ The text format treats all of these as reserved tokens; to use those same charac
 (As a historical aside, the null type exists primarily for compatibility with JSON, which has only the untyped null value.)
 
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 3.1.1 Booleans
 
@@ -60,6 +63,7 @@ following three reserved tokens:
 (As with the null values, one can single-quote those tokens to force
 them to be parsed as symbols.)
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 3.1.1 Integers
 
@@ -94,6 +98,7 @@ separate digits.
 In the text notation, integer values must be followed by one of the
 thirteen numeric stop-characters: {}[](),\\"\\'\\ \\t\\n\\r.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.1.1 Floats
 
@@ -121,6 +126,7 @@ Because most decimal values cannot be represented exactly in binary
 floating-point, float values may change “appearance” and precision when
 reading or writing Ion text.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.1.1 Decimals
 
@@ -153,6 +159,7 @@ an underscore.
 The precision of decimal values, including trailing zeros, is
 significant and is preserved through round-trips.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.1.1 Timestamps
 
@@ -228,6 +235,7 @@ not equivalent:
 In the text notation, timestamp values must be followed by one of the
 thirteen numeric stop-characters: {}[](),\\"\\'\\ \\t\\n\\r.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.1.1 Strings
 
@@ -243,6 +251,7 @@ C/Java backslash-escape conventions (see below).
    xml::"<e a='v'>c</e>"  // String with type annotation 'xml'
 .in 3
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.1.1.x Long Strings
 
@@ -271,6 +280,7 @@ between two long strings.
    '''
 .in 3
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.1.1.x Escape Characters
 
@@ -318,6 +328,7 @@ o General octal escape sequences, \\OOO
 
 .in 3
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.1.1 Symbols
 
@@ -358,6 +369,7 @@ does not retain whitespace.
 See Ion Symbols for more details about symbol representations and
 symbol tables.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.1.1 Blobs
 
@@ -406,6 +418,7 @@ The / character is always considered part of the Base64 data.
     {{ dHdvIHBhZGRpbmc_gY2hhcmFjdGVycw= }}
 
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.1.1 Clobs
 
@@ -441,6 +454,7 @@ Note that the shift_jis type annotation above is, like all type
 annotations, application-defined. Ion does not interpret or validate
 that symbol; that’s left to the application.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.2.1 Structures
 
@@ -473,6 +487,7 @@ the content.
 
 .in 3
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.2.2 Lists
 
@@ -490,6 +505,7 @@ are separated by commas.
 
 .in 3
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.2.3 S-Expressions
 
@@ -512,6 +528,7 @@ Although Ion S-expressions use a syntax similar to Lisp expressions, Ion
 does not define their interpretation or any semantics at all, beyond the
 pure sequence-of-values data model indicated above.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 2.2.4 Type Annotations
 

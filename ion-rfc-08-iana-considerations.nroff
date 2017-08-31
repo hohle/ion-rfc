@@ -1,6 +1,59 @@
+.tm 8. IANA Considerations .................................... \n%
 .ti 0
-4.  IANA Considerations
+8.  IANA Considerations
 
 No actions are required from IANA as result of the publication of
 this document.
 
+The MIME media type for Ion is application/ion.
+
+Type name: application
+
+Subtype name: ion
+
+Required parameters: n/a
+
+Optional parameters: charset
+
+Encoding considerations: binary
+
+Security considerations: See [RFC Ion], Section 7.
+
+Interoperaaability considerations: Described in [RFC Ion].
+
+Published specification: [RFC Ion]
+
+Applications that use this media type:
+
+.in 6
+Ion has been used to exchange data between applications written in all
+of these programming languages: C, C++, Java, Perl, Python, Ruby, and
+JavaScript.
+
+.in 3
+Additional information:
+
+.in 6
+  Magic number(s): TODO
+  File extension(s): .ion, .10n, .ion.gz, .10n.gz
+
+.in 3
+Person & email address to contact for further information:
+
+.in 6
+ion@amazon.com
+
+.in 3
+Intended usage: COMMON
+
+Restrictions on usage: none
+
+Author:
+
+.in 6
+    Originally written by Todd Jonker, Alman Goo, and Jonathan Hohle
+
+    Translated to RFC by Jonathan Hohle
+
+.in 3
+Change controller: Amazon.com, Inc.

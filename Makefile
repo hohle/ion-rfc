@@ -38,6 +38,7 @@ SPELL_OUTPUT = \
 	  ion-rfc-references.sc
 
 OUTPUT = ion-rfc.txt
+TOC = toc.input
 
 #
 # Macros
@@ -52,10 +53,26 @@ all: $(OUTPUT) verify
 verify: check-spelling
 	$(call print_target)
 
-$(OUTPUT): $(SOURCES)
+$(OUTPUT): $(SOURCES) toc.input
 	$(call print_target)
-	echo `pwd`
 	nroff -ms $(SOURCES) > $@
+
+toc.input: $(SOURCES)
+	$(call print_target)
+	# run once to generate a placeholder TOC
+	# which will block correctly, but include
+	# wrong page numbers
+	groff -z $(SOURCES) 2>&1 >/dev/null | \
+	    sed 's/^_//' | \
+	    grep -v ': warning: ' | \
+	    sed 's/^/   /' | \
+	    tee $@
+	# do it again with correct line numbers
+	groff -z $(SOURCES) 2>&1 >/dev/null | \
+	    sed 's/^_//' | \
+	    grep -v ': warning: ' | \
+	    sed 's/^/   /' | \
+	    tee $@
 
 check-spelling: $(SPELL_OUTPUT)
 	$(call print_target)
@@ -80,6 +97,7 @@ $(OUTPUT_DICT): $(DICT)
 clean:
 	$(call print_target)
 	echo `pwd`
+	rm -f toc.input
 	rm -f $(OUTPUT)
 	rm -f $(OUTPUT_DICT)
 	rm -f $(SPELL_OUTPUT)

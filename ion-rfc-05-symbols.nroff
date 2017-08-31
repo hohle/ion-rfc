@@ -1,3 +1,4 @@
+.tm 5. Ion Symbols & Symbol Tables ......................................... \n%
 .ti 0
 5. Ion Symbols & Symbol Tables
 
@@ -22,6 +23,7 @@ o Symbol Identifier: an identifier that starts with $ (dollar sign) followed by 
 .in 3
 By convention, symbols starting with $ should be reserved for system tools, processing frameworks, and the like, and should be avoided by applications and end users. In particular, the symbol $ion and all symbols starting with $ion_ are reserved for use by the Ion notation and by related standards.
 
+.tm _   5.1 Symbol Tables ......................................... \n%
 .ti 0
 5.1 Symbol Tables
 
@@ -35,13 +37,15 @@ A local symbol table is for the sole use of a well-defined scope of Ion data. Si
 
 At any point during processing, there is a current symbol table, which is either a local symbol table or a system symbol table. At the start of input, the current symbol table is initialized to be the system symbol table for Ion 1.0. The current symbol table is only changed in two circumstances: (1) encountering a system identifier at the top-level, or (2) encountering a local symbol table at the top-level.
 
+.tm _      5.1.1 The Catalog ......................................... \n%
 .ti 0
-5.1.3 The Catalog
+5.1.1 The Catalog
 
 This specification refers to a “catalog”. That’s simply an abstraction for the set of available Ion shared symbol tables. It’s not necessarily a static set: one could implement a catalog that pulls symbol tables from a network repository, or one that has application symbol tables “compiled in”, or (very likely) some composition of these techniques. The mechanism by which shared symbol tables are acquired is irrelevant to this specification.
 
+.tm _      5.1.2 Top-Level Semantics  ......................................... \n%
 .ti 0
-5.1.1 Top-Level Semantics
+5.1.2 Top-Level Semantics
 
 Symbol tables only (meaningfully) occur at the top level of a data stream or datagram. An Ion data stream is structured as follows:
 
@@ -55,6 +59,7 @@ o Certain top-level values such as IVMs and local symbol tables are referred to 
 
 .in 3
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 5.1.x System Symbols
 The version included in the system identifier is independent of the version of the implied system symbol table (named "$ion"). Each version of the Ion specification defines the corresponding system symbol table version. Ion 1.0 uses the "$ion" symbol table, version 1, and future versions of Ion will use larger versions of the "$ion" symbol table. $ion_1_1 will probably use version 2, while $ion_2_0 might use version 5.
@@ -91,6 +96,7 @@ Equivalently:
 
 .in 3
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 5.2 Ion Version Markers
 
@@ -176,6 +182,7 @@ Here is a bad example of re-encoding the previous example in a naive way:
 The problem with the above example is that the conversion of '$ion_1_0' to $ion_1_0 changed it from being a NOP to an IVM which resets the current symbol table to the system symbol table.
 
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 5.1.2 Local Symbol Tables
 
@@ -216,6 +223,7 @@ Null elements in the symbols list declare unknown symbol text (“gaps”) for i
 
 Any other field (including, for example, name or version) is ignored.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 5.1.2.a Imports
 
@@ -257,6 +265,7 @@ After processing imports, a number of symbol IDs will have been allocated, inclu
 
 Note: This specification allows a local table to declare multiple imports with the same name, perhaps even the same version. Such a situation provides redundant data and allocates unnecessary symbol IDs but is otherwise harmless.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 5.1.2.b Semantics
 
@@ -272,14 +281,17 @@ o Each imported table is consulted in the order of import.
 
 o Local symbols are last.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 5.1.3 Shared Symbol Tables
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 5.2 Symbol Zero
 
 A special SID zero (i.e. $0) is also valid in Ion, it is a special symbol that is not defined by any symbol table, even the system symbol table. It is a symbol with no text defined for it, and can be useful in synthesizing symbol identifiers where the text image of the symbol is not known in a particular operating context. It is important to note that $0 is not semantically equivalent to other symbols with no text associated with them (e.g. imported symbols where the shared symbol table is unavailable), so replacing such SIDs with $0 is a destructive operation to the semantics of the data.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 5.2 Data Model
 
@@ -302,6 +314,7 @@ o SID 0 is only equivalent to itself.
 .in 3
 A processor encountering a symbol with unknown text and a valid SID other than $0 MAY produce an error because this means that the context of the data is missing, however any implementation that chooses not to MUST conform to the above semantics with respect to round-tripping data.
 
+.tm _       2.1.5. Timestamps ......................................... \n%
 .ti 0
 5.3 Examples
 

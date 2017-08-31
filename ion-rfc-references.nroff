@@ -1,6 +1,8 @@
+.tm 6. References ......................................... \n%
 .ti 0
 6.  References
 
+.tm _   6.1. Normative References ......................................... \n%
 .ti 0
 6.1.  Normative References
 
@@ -18,6 +20,7 @@ Specifications: ABNF", RFC 4234, October 2005.
 .\" formatted in the style of the RFC Editor are available here:
 .\" ftp://ftp.rfc-editor.org/in-notes/rfc-ref.txt
 
+.tm _   6.2. Informative References  ......................................... \n%
 .ti 0
 6.2.  Informative References
 
