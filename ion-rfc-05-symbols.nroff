@@ -2,8 +2,8 @@
 .ti 0
 5. Ion Symbols & Symbol Tables
 
-Ion symbols are critical to the notation’s performance and
-space-efficiency. 
+Ion symbols are critical to the notation's performance and
+space-efficiency.
 
 In Ion binary, all symbols are represented as integers. These integers
 are symbol IDs whose corresponding text forms are defined by a
@@ -35,9 +35,9 @@ A subset of identifiers have special meaning:
 .ti 6
 o Symbol Identifier: an identifier that starts with $ (dollar sign)
   followed by one or more digits. These identifiers directly represent
-  the symbol’s integer symbol ID, not the symbol’s text. This form is
+  the symbol's integer symbol ID, not the symbol's text. This form is
   not typically visible to users, but they should be aware of the
-  reserved notation so they don’t attempt to use it for other purposes.
+  reserved notation so they don't attempt to use it for other purposes.
 
 .in 3
 By convention, symbols starting with $ should be reserved for system
@@ -82,8 +82,8 @@ or (2) encountering a local symbol table at the top-level.
 .ti 0
 5.1.1 The Catalog
 
-This specification refers to a “catalog”. That’s simply an abstraction
-for the set of available Ion shared symbol tables. It’s not necessarily
+This specification refers to a "catalog". That's simply an abstraction
+for the set of available Ion shared symbol tables. It's not necessarily
 a static set: one could implement a catalog that pulls symbol tables
 from a network repository, or one that has application symbol tables
 "compiled in", or (very likely) some composition of these techniques.
@@ -193,7 +193,7 @@ top-level, it has no processing effect and is treated as an ordinary
 user value.
 
 IVMs do not have annotations. The input ann::$ion_1_0 is not a version
-marker, it’s a symbol with an annotation.
+marker, it's a symbol with an annotation.
 
 In Ion binary, there is a special sequence of bytes that represent
 the IVM.
@@ -218,16 +218,16 @@ as IVMs:
 .nf
    // explicitly quoted
    '$ion_1_0'
-   
+
    // explicitly quoted with some newline escapes
    '$ion_\
    1\
    _\
    0'
-   
+
    // symbol ID mapping $ion_1_0 declared in the system symbol table
    $2
-   
+
    $ion_symbol_table::
    {
      symbols:["$ion_1_0"]
@@ -251,7 +251,7 @@ example of IVMs mixed with these NOP encodings:
    // also not the IVM
    $2
    The above is equivalent to the following, more concise Ion:
-   
+
    $ion_1_0
    a
 
@@ -352,7 +352,7 @@ Each import (including the implicit system table import) allocates a
 contiguous, non-overlapping sequence of symbol IDs. The system symbols
 start at 1, each import starts one past the end of the previous import,
 and the local symbols start immediately after the last import. The size
-of each import’s subsequence is defined by the max_id on the import
+of each import's subsequence is defined by the max_id on the import
 statement, regardless of the actual size of the referenced table.
 
 Import structs in an import list are processed in order as follows:
@@ -442,6 +442,108 @@ o Local symbols are last.
 .ti 0
 5.2.3. Shared Symbol Tables
 
+This section defines the serialized form of shared symbol tables.
+Unlike local symbol tables, the Ion parser does not intrinsically
+recognize or process this data; it is up to higher-level specifications
+or conventions to define how shared symbol tables are communicated.
+
+.KS
+.nf
+   $ion_shared_symbol_table::
+   {
+     name: "com.amazon.ols.symbols.offer",
+     version: 1,
+     imports: // For informational purposes only.
+     [
+       { name:"..." , version:1 },
+       // ...
+     ],
+     symbols:
+     [
+       "fee", "fie", "foe", /* ... */ "hooligan"
+     ]
+   }
+.KE
+
+.in 3
+A shared symbol table is serialized as a struct with the annotation
+$ion_shared_symbol_table.
+
+The name field should be a string with length at least one. If the
+field has any other value, then materialization of this symbol table
+must fail.
+
+The version field should be an int and at least 1. If the field is
+missing or has any other value, it is treated as if it were 1.
+
+The imports field is for informational purposes only in shared tables.
+They assert that this table contains a superset of the strings in each
+of these named tables. It makes no assertion about any relationship
+between symbol IDs in this table and the imports, only that the symbols'
+text occurs here. An implementation MAY issue a warning if these claims
+don't match what's in the symbols field.
+
+The symbols field should be a list of strings. If the field is missing
+or has any other type, it is treated as if it were an empty list.
+
+Null elements declare undefined symbol IDs ("gaps") within the sequence;
+implementations must handle requests for such symbols the same as if the
+requested ID beyond the end of the list. Any element of the list that is
+not a string must be interpreted as if it were null.
+
+A few things worth noting:
+
+.in 9
+.ti 6
+o Shared symbol tables do not make use of a max_id field since the
+largest SID is implicit in the symbols list. If a max_id field exists,
+it must be ignored.
+
+.ti 6
+o A shared table isn't coupled to any particular system table, so it can
+be used in any context.
+
+.ti 6
+o The algorithm for SID assignment differs between shared and local
+tables. Sids in shared tables always start at one. Sids in local tables
+are always offset by the sum of the sizes of the system symbol table and
+all imported tables.
+
+.in 3
+
+.tm _        5.2.3.1. Semantics ....................................... \n%
+.ti 0
+5.2.3.1. Semantics
+
+Symbol IDs are assigned to the symbols strings in order of their
+appearance in the list: the first element has symbol ID 1 (aka $1), the
+last has the symbol ID equal to the length of the list.
+
+When mapping from symbol ID to string, a simple index into the list is
+all that's needed.
+
+When mapping from string to symbol ID, there may be multiple associated
+IDs (the same string could appear twice as children of the symbols
+field). Implementations MUST select the lowest known ID, and all other
+associated IDs MUST be handled as if undefined.
+
+.tm _        5.2.3.2. Versioning ...................................... \n%
+.ti 0
+5.2.3.2. Versioning
+
+A shared symbol table with version greater than one should usually be a
+strict extension of the immediately preceding version, but Ion does not
+(and in reality cannot) enforce this. Symbols may be removed, but they
+cannot be renumbered or given different text. This ensures that when
+version N is requested, any version larger than N can be used without
+changing semantics. However, if symbols become undefined then some
+extant data may become unreadable when an exact-match import cannot
+be found.
+
+The use of symbol tables that violate these restriction will lead to undefined and potentially incorrect interpretation of Ion data. Therefore implementations should enforce these restrictions at appropriate points.
+
+Version N+1 of a table MAY be the same as version N.
+
 .tm _  5.3. Symbol Zero ............................................... \n%
 .ti 0
 5.3. Symbol Zero
@@ -515,8 +617,8 @@ A typical text document looks like:
      imports:[{ name:"com.amazon.ols.symbols.offer", version:1 },
               { name:"com.amazon.ims3.symbols.submission", version:1 }]
    }
-  
-   // Here’s the user data, one or more top-level values.
+
+   // Here's the user data, one or more top-level values.
    submission::{ /* ... */ local_symbol  /* ... */ }
    submission::{ /* ... */ 'another one' /* ... */ }
 
@@ -525,7 +627,7 @@ The example above shows a local table with imports but no symbols. This
 is a typical scenario for human-authored data. When parsing this text,
 the local table will be extended on the fly to contain any new symbols.
 
-Here’s the same data printed after parsing, in which the local table has
+Here's the same data printed after parsing, in which the local table has
 been extended with symbols encountered in the user data.
 
 .nf
@@ -544,7 +646,7 @@ Since the $ion_1_0 defines eight symbols ($1 through $9), the offer
 table covers ids $10 through $84, the submission table covers ids $85
 through $184, and local symbols start at $185.
 
-Here’s the same data as above serialized with a local symbol table being
+Here's the same data as above serialized with a local symbol table being
 "flushed" between each top-level value.
 
 .nf

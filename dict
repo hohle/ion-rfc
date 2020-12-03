@@ -18,6 +18,7 @@ IEEE
 IETF
 ISI
 IVM
+IVMs
 Ints
 IonText
 Jonker
@@ -26,6 +27,7 @@ NOP
 NUL
 OOO
 SIDs
+Subtype
 UInt
 UInts
 USC
@@ -35,6 +37,7 @@ VarInt
 VarInts
 VarUInt
 VarUInts
+Versioning
 annot
 bool
 booleans

@@ -63,11 +63,11 @@ $(OUTPUT): $(SOURCES) toc.input
 
 toc.input: $(SOURCES)
 	$(call print_target)
-	touch toc.input
+	@touch toc.input
 	# run once to generate a placeholder TOC
 	# which will block correctly, but include
 	# wrong page numbers
-	nroff -ms $(SOURCES) 2>&1 >/dev/null | \
+	@nroff -ms $(SOURCES) 2>&1 >/dev/null | \
 	    sed 's/^_/ /' | \
 	    grep -v ': warning: ' | \
 	    sed 's/^/   /' | \
@@ -86,18 +86,47 @@ check-spelling: $(SPELL_OUTPUT)
 $(SPELL_OUTPUT): $(.PREFIX).nroff $(OUTPUT_DICT)
 	$(call print_target)
 
-	cat $(.PREFIX).nroff | \
+	@cat $(.PREFIX).nroff | \
 	    aspell list \
 	    --mode nroff \
 	    --lang="$(LANG)" \
 	    --extra-dicts="./$(OUTPUT_DICT)" \
 	    -a | \
-	    sort -u > $@
+	    sort -u | \
+	    tee $@ | \
+	    xargs -n 1 printf "\\033[0;31m$(.PREFIX).nroff >>>\033[0m %s\n"
 
 $(OUTPUT_DICT): $(DICT)
 	$(call print_target)
 
 	aspell --lang="$(LANG)" create master "./$@" < $(.ALLSRC)
+
+ion-rfc.pdf: $(OUTPUT)
+	    cat $(OUTPUT) | \
+		awk ' \
+				{ gsub(/\r/, ""); } \
+				{ gsub(/[ \t]+$$/, ""); } \
+/\[?[Pp]age [0-9ivx]+\]?[ \t]*$$/{ pageend=1; print; next; } \
+/^[ \t]*\f/			{ formfeed=1; print; next; } \
+/^ *Internet.Draft.+[0-9]+ *$$/	{ newpage=1; } \
+/^ *INTERNET.DRAFT.+[0-9]+ *$$/	{ newpage=1; } \
+/^RFC.+[0-9]+$$/		{ newpage=1; } \
+/^draft-[-a-z0-9_.]+.*[0-9][0-9][0-9][0-9]$$/ { \
+				  newpage=1; \
+				} \
+/^[ \t]*$$/			{ \
+				  if (pageend && !newpage) next; \
+				} \
+				{ \
+				  if ( pageend && newpage && !formfeed ) { print "\f"; } \
+				  pageend=0; formfeed=0; newpage=0; \
+				  print \
+				} \
+' | \
+		enscript --margins 76::76: -B -q -p - | \
+		ps2pdf - $@
+
+pdf: ion-rfc.pdf
 
 clean:
 	$(call print_target)
@@ -106,3 +135,4 @@ clean:
 	rm -f $(OUTPUT)
 	rm -f $(OUTPUT_DICT)
 	rm -f $(SPELL_OUTPUT)
+	rm -f ion-rfc.pdf

@@ -125,7 +125,7 @@ In the text notation, real values must be followed by one of the
 thirteen numeric stop-characters: {}[](),\\"\\'\\ \\t\\n\\r.
 
 Because most decimal values cannot be represented exactly in binary
-floating-point, float values may change “appearance” and precision when
+floating-point, float values may change "appearance" and precision when
 reading or writing Ion text.
 
 .tm _  3.5. Decimals .................................................. \n%
@@ -365,7 +365,7 @@ Operators and identifiers can be juxtaposed without whitespace:
 
 .in 3
 Note that the data model does not distinguish between identifiers,
-operators, or other symbols, and that – as always – the binary format
+operators, or other symbols, and that - as always - the binary format
 does not retain whitespace.
 
 See Ion Symbols for more details about symbol representations and
@@ -454,7 +454,7 @@ differences between Ion strings and clobs.
 .in 3
 Note that the shift_jis type annotation above is, like all type
 annotations, application-defined. Ion does not interpret or validate
-that symbol; that’s left to the application.
+that symbol; that's left to the application.
 
 .tm _  3.11. Structs .................................................. \n%
 .ti 0
@@ -462,7 +462,7 @@ that symbol; that’s left to the application.
 
 In the text format, structures are wrapped by curly braces, with a colon
 between each name and value, and a comma between the fields. For the
-purposes of JSON compatibility, it’s also legal to use strings for field
+purposes of JSON compatibility, it's also legal to use strings for field
 names, but they are converted to symbol tokens by the parser.
 
 .nf

@@ -9,7 +9,7 @@
 .ds RF FORMFEED[Page %]
 .ds LH Internet Draft
 .\"   --> Header/footers: Set short title, author(s), and dates:
-.ds CH The Amazon Ion Specification      \" <Short title>
+.ds CH Ion                               \" <Short title>
 .ds LF Jonker, Goo, Hohle                \" <Authors>
 .ds RH June 22, 2017                     \" <Submission date>
 .ds CF Expires December 2017             \" <Expiration date>
