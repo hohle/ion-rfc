@@ -511,7 +511,7 @@ be used in any context.
 
 .ti 6
 o The algorithm for SID assignment differs between shared and local
-tables. Sids in shared tables always start at one. Sids in local tables
+tables. SIDs in shared tables always start at one. SIDs in local tables
 are always offset by the sum of the sizes of the system symbol table and
 all imported tables.
 
