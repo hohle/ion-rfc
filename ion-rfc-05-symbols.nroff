@@ -143,17 +143,17 @@ specification disallows (by ignoring) imports named "$ion").
 Here are the system symbols for Ion 1.0.
 
 .nf
-   Symbol ID	Symbol Name
+   Symbol ID     Symbol Name
 
-   1	$ion
-   2	$ion_1_0
-   3	$ion_symbol_table
-   4	name
-   5	version
-   6	imports
-   7	symbols
-   8	max_id
-   9	$ion_shared_symbol_table
+   1             $ion
+   2             $ion_1_0
+   3             $ion_symbol_table
+   4             name
+   5             version
+   6             imports
+   7             symbols
+   8             max_id
+   9             $ion_shared_symbol_table
 
 .in 3
 Equivalently:

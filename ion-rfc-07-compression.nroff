@@ -1,6 +1,6 @@
-.tm 6. Compression .................................................... \n%
+.tm 7. Compression .................................................... \n%
 .ti 0
-6. Compression
+7. Compression
 
 Both the text and binary representations of an Ion value stream may be
 compressed in one or more GZIP [RFC 1952] members.

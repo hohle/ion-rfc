@@ -1,0 +1,237 @@
+.tm 6. Ion Strings & Clobs ............................................ \n%
+.ti 0
+6. Ion Strings & Clobs
+
+This document clarifies the semantics of the Amazon Ion string and clob
+data types with respect to escapes and the [Unicode][2] standard.
+
+As of the date of this writing, the Unicode Standard is on
+[version 10.0][3]. This specification is to that standard.
+
+.tm 6.1 Unicode Primer ................................................ \n%
+.ti 0
+6.1 Unicode Primer
+
+The Unicode standard specifies a large set of code points, the Universal
+Character Set (UCS), which is an integer in the range of 0 (0x0) through
+1,114,111 (0x10FFFF) inclusive. Throughout this document, the notation
+U+HHHH and U+HHHHHHHH refer to the Unicode code point HHHH and HHHHHHHH
+respectively as a hexadecimal ordinal. This notation follows the Unicode
+standard convention.
+
+Traditionally, from a programmer's perspective, a code point can be thought
+of as a character, but there is sometimes a subtle distinction. For
+example, in Java, the char type is an unsigned, 16-bit integer, which is
+normally used to hold UTF-16 code units (e.g. [java.lang.CharSequence][4]).
+For the Unicode code point, Mathematical Bold Capital "A" (code point
+U+0001D400), this encoded in a UTF-16 string as two units: 0xD835 followed
+by 0xDC00. So in this case, Java's UTF-16 representation actually utilizes
+two character (i.e. char) values to represent one Unicode code point.
+
+This document attempts to avoid using the term character when referring to
+Unicode code points. The reasoning for this is partly stated above, but
+also has to do with the overloaded nature of the term (e.g. a user
+character or grapheme). For more details, consult section [3.4 of the
+Unicode Standard][5].
+
+Another interesting aspect of the UCS, is a block of code points that is
+reserved exclusively for use in the UTF-16 encoding (i.e. surrogate code
+points). As such, strictly speaking, no encoding of Unicode are allowed to
+represent the code points in the inclusive range U+D800 to U+DFFF. In the
+UTF-16 case, these code points are only allowed to be used in the encoding
+to specify characters in the U+00010000 to U+0010FFFF range. Refer to
+sections [3.8 and 3.9 of the Unicode Standard][5] for details.
+
+.tm _  6.1. Ion String ................................................ \n%
+.ti 0
+6.2 Ion String
+
+The Ion String data type is a sequence of Unicode code points. The Ion
+semantics of this are agnostic to any particular Unicode encoding (e.g.
+UTF-16, UTF-8), except for the concrete syntax specification of the Ion
+binary and text formats.
+
+.tm _     6.2.1. Text Format  ......................................... \n%
+.ti 0
+6.2.1 Text Format
+
+See the [grammar][6] for a formal definition of the Ion Text encoding for
+the string type.
+
+Multiple Ion long string literals that are adjacent to each other by zero
+or more whitespace are concatenated automatically. For example the
+following two blocks of Ion text syntax are semantically equivalent. Note
+that short string literals do not exhibit this behavior.
+
+.nf
+    "1234"    '''Hello'''    '''World'''
+
+    "1234"    "HelloWorld"
+
+.in 3
+Each individual long string literal must be a valid Unicode character
+sequence when unescaped. The following examples are invalid due to
+splitting Unicode escapes, an escaped surrogate pair, and a common escape,
+respectively.
+
+.nf
+    '''\u'''        '''1234'''
+
+    '''\U0000'''    '''1234'''
+
+    '''\uD800'''    '''\uDC00'''
+
+    '''\'''         '''n'''
+
+.in 3
+Within long string literals unescaped newlines are normalized such that
+U+000D U+000A pairs (CARRIAGE RETURN and LINE FEED respectively) and U+000D
+are replaced with U+000A. This is to facilitate compatibility across
+operating systems.
+
+Normalization can be subverted by using a combination of escapes:
+
+.nf
+    CARRIAGE RETURN only:
+    '''one\r\
+    two'''
+
+    CARRIAGE RETURN and LINE FEED:
+    '''one\r
+    two'''
+
+.in 3
+
+Escaped newlines are not replaced with any characters (i.e. the newline is
+removed). In addition, the following table describes the string escape
+sequences that have direct code point replacement for all quoted string and
+symbol forms.
+
+.nf
+    Unicode Code Point     Ion Escape     Semantics
+
+    U+0007                 \a             BEL (alert)
+    U+0008                 \b             BS (backspace)
+    U+0009                 \t             HT (tab)
+    U+000A                 \n             LF (linefeed)
+    U+000C                 \f             FF (form feed)
+    U+000D                 \r             CR (carriage return)
+    U+000B                 \v             VT (vertical tab)
+    U+0022                 \"             double quote
+    U+0027                 \'             single quote
+    U+003F                 \?             question mark
+    U+005C                 \\             backslash
+    U+002F                 \/             forward slash
+    U+0000                 \0             NUL (null character)
+
+.in 3
+The for the Unicode ordinal string escapes, \U, \u, and \x, the escape must
+be followed by a number of hexadecimal digits as described below.
+
+.nf
+    Unicode        Ion
+    Code Point     Sequnence      Semantics
+
+    U+HHHHHHHH     \UHHHHHHHH     8-digit hexadecimal Unicode code point
+    U+HHHH         \uHHHH         4-digit hexadecimal Unicode code point;
+                                  equivalent to \U0000HHHH
+    U+00HH         \xHH           2-digit hexadecimal Unicode code point;
+                                  equivalent to \u00HH and \U000000HH
+
+.in 3
+Ion does not specify the behavior of specifying invalid Unicode code points
+or surrogate code points (used only for UTF-16) using the escape sequences.
+It is highly recommended that Ion implementations reject such escape
+sequences as they are not proper Unicode as specified by the standard. To
+this point, consider the Ion string sequence, "\uD800\uDC00". A compliant
+parser may throw an exception because surrogate characters are specified
+outside of the context of UTF-16, accept the string as a technically
+invalid sequence of two Unicode code points (i.e. U+D800 and U+DC00), or
+interpret it as the single Unicode code point U+00010000. In this regard,
+the Ion string data type does not conform to the Unicode specification.
+A strict Unicode implementation of the Ion text should not accept such
+sequences.
+
+.tm _     6.2.2. Binary Format  ....................................... \n%
+.ti 0
+6.2.2 Binary Format
+
+The Ion binary format encodes the string data type directly as a sequence
+of UTF-8 octets. A strict, Unicode compliant implementation of Ion should
+not allow invalid UTF-8 sequences (e.g. surrogate code points, overlong
+values, and values outside of the inclusive range, U+0000 to U+0010FFFF).
+
+.tm 6.3 Ion Clob ...................................................... \n%
+.ti 0
+6.3 Ion Clob
+
+An Ion clob type is similar to the blob type except that the denotation in
+the Ion text format uses an ASCII-based string notation rather than a
+base64 encoding to denote its binary value. It is important to make the
+distinction that clob is a sequence of raw octets and string is a sequence
+of Unicode code points.
+
+.tm _     6.3.1. Text Format  ......................................... \n%
+.ti 0
+6.3.1. Text Format
+
+See the [grammar][6] for a formal definition of the Ion Text encoding for
+the clob type.
+
+Similar to string, adjoining long string literals within an Ion clob are
+concatenated automatically. Within a clob, only one short string literal or
+multiple long string literals are allowed. For example, the following two
+blocks of Ion text syntax are semantically equivalent.
+
+.nf
+    {{ '''Hello'''    '''World''' }}
+
+    {{ "HelloWorld" }}
+
+.in 3
+The rules for the quoted strings within a clob follow the similarly to the
+string type, with the following exceptions. Unicode newline characters in
+long strings and all verbatim ASCII characters are interpreted as their
+ASCII octet values. Non-printable ASCII and non-ASCII Unicode code points
+are not allowed unescaped in the string bodies. Furthermore, the following
+table describes the clob string escape sequences that have direct octet
+replacement for both all strings.
+
+.nf
+    Octet     Ion Escape     Semantics
+    0x07      \a             ASCII BEL (alert)
+    0x08      \b             ASCII BS (backspace)
+    0x09      \t             ASCII HT (tab)
+    0x0A      \n             ASCII LF (line feed)
+    0x0C      \f             ASCII FF (form feed)
+    0x0D      \r             ASCII CR (carriage return)
+    0x0B      \v             ASCII VT (vertical tab)
+    0x22      \"             ASCII double quote
+    0x27      \'             ASCII single quote
+    0x3F      \?             ASCII question mark
+    0x5C      \\             ASCII backslash
+    0x2F      \/             ASCII forward slash
+    0x00      \0             ASCII NUL (null character)
+
+.in 3
+The clob escape \x must be followed by two hexadecimal digits. Note that
+clob does not support the \u and \U escapes since it represents an octet
+sequence and not a Unicode encoding.
+
+.nf
+    Octet     Ion Escape     Semantics
+    0xHH      \xHH           2-digit hexadecimal octet
+
+.in 3
+It is important to note that clob is a binary type that is designed for
+binary values that are either text encoded in a code page that is ASCII
+compatible or should be octet editable by a human (escaped string syntax
+vs. base64 encoded data). Clearly non-ASCII based encodings will not be
+very readable (e.g. the clob for the EBCDIC encoded string representing
+"hello" could be denoted as {{ "\xc7\xc1%%?" }}).
+
+.tm _     6.3.2. Binary Format  ....................................... \n%
+.ti 0
+6.3.2. Binary Format
+
+This is represented directly as the octet values in the clob value.
