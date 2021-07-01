@@ -25,11 +25,19 @@ Specifications: ABNF", RFC 4234, October 2005.
 10.2.  Informative References
 
 .ti 3
-[2223BIS]  Reynolds, J. and R. Braden, "Instructions to Request for
-Comments (RFC) Authors", draft-rfc-editor-rfc2223bis-08.txt, August 2004.
-.\" Please include the draft string when referencing drafts.
-.\" Although it will be removed prior to publication, it is helpful
-.\" to the editor for consistency checking.
+[RFC1952]  Deutsch, L., "GZIP file format specification version 4.3",
+RFC 1952, May 1996.
+
+.ti 3
+[RFC2822]  Resnick, P., "Internet Message Format", RFC 2822, April 2001.
+
+.ti 3
+[RFC3339]  Klyne, G., "Date and Time on the Internet: Timestamps",
+RFC 3339, July 2002.
+
+.ti 3
+[RFC4648]  Josefsson, S., "The Base16, Base342, and Base64 Encodings",
+RFC 3548, October 2006.
 
 .in 3
 .ti 0
@@ -40,19 +48,13 @@ Authors' Addresses
 .\"  the last section before the legal boilerplate and is normally
 .\"  unnumbered.
 .nf
-Jon Postel
-Former Address:
-   USC Information Sciences Institute
-Current Address:
-   Unknown (but we are hopeful)
-EMail: postel@isi.edu (known to be a black hole)
+Jonathan Hohle
+15987 N 114th Way
+Scottsdale, AZ 85255
+Tel: 480 323 5799 (Jonathan Hohle)
+EMail: jonhohle@gmail.com
 
+Questions about the technical content of this specification can be
+sent by email to:
 
-RFC Editor
-USC Information Sciences Institute
-4676 Admiralty Way
-Marina del Rey, CA 90292-6695
-
-Tel: 310 448 9369 (Sandy Ginoza)
-Tel: 310 448 9173 (Bob Braden)
-EMail: rfc-editor@rfc-editor.org
+The Ion Team <ion@amazon.com>
