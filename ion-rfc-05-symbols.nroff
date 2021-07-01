@@ -250,8 +250,13 @@ example of IVMs mixed with these NOP encodings:
    '$ion_1_0'
    // also not the IVM
    $2
-   The above is equivalent to the following, more concise Ion:
+   // maps to "a"
+   $10
 
+.in 3
+The above is equivalent to the following, more concise Ion:
+
+.nf
    $ion_1_0
    a
 
