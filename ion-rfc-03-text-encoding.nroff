@@ -98,7 +98,7 @@ separate digits.
 .in 3
 
 In the text notation, integer values must be followed by one of the
-thirteen numeric stop-characters: {}[](),\\"\\'\\ \\t\\n\\r.
+fifteen numeric stop-characters: {}[](),\\"\\'\\ \\t\\n\\r\\v\\f.
 
 .tm _  3.4. Floats .................................................... \n%
 .ti 0
@@ -122,7 +122,7 @@ values; other sizes may be supported in future versions of
 this specification.
 
 In the text notation, real values must be followed by one of the
-thirteen numeric stop-characters: {}[](),\\"\\'\\ \\t\\n\\r.
+fifteen numeric stop-characters: {}[](),\\"\\'\\ \\t\\n\\r\\v\\f.
 
 Because most decimal values cannot be represented exactly in binary
 floating-point, float values may change "appearance" and precision when
@@ -235,7 +235,7 @@ not equivalent:
 
 .in 3
 In the text notation, timestamp values must be followed by one of the
-thirteen numeric stop-characters: {}[](),\\"\\'\\ \\t\\n\\r.
+fifteen numeric stop-characters: {}[](),\\"\\'\\ \\t\\n\\r\\v\\f.
 
 .tm _  3.7. Strings ................................................... \n%
 .ti 0
