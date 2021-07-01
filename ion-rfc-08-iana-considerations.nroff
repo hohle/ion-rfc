@@ -34,7 +34,7 @@ JavaScript.
 Additional information:
 
 .in 6
-  Magic number(s): TODO
+  Magic number(s): 0xE0 0x01 0x00 0xEA
   File extension(s): .ion, .10n, .ion.gz, .10n.gz
 
 .in 3
