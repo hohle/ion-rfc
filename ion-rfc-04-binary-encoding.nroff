@@ -344,9 +344,9 @@ store the magnitude.
 .in 3
 Zero is always stored as positive; negative zero is illegal.
 
-If the value is zero then T must be 2, L is zero, and there are no
-length or magnitude subfields. As a result, when T is 3, both L and the
-magnitude subfield must be non-zero.
+If L is 0 the value is zero, and there are no length or magnitude
+subfields. As a result, when T is 3, both L_ and the magnitude subfield
+must be non-zero.
 
 With either type code 2 or 3, if L is 15, then the value is null.int and
 the magnitude is empty. Note that this implies there are two equivalent
@@ -686,6 +686,10 @@ o When L is 1, the struct has at least one symbol/value pair, the length
   increasing order.
 
 .ti 6
+o When L is 14, the length field exists, and no assertion is made about
+  field ordering.
+
+.ti 6
 o When L is 15, the value is null.struct, and there's no length or
   nested fields.
 
@@ -695,8 +699,8 @@ o When 1 < L < 14 then there is no length field as L is enough to
   field ordering.
 
 .ti 6
-o Otherwise, the length field exists, and no assertion is made about
-  field ordering.
+o Otherwise, 1 < L < 14  and there is no length field as _L_ is enough to
+  represent the struct size. No assertion is made about field ordering.
 
 .in 3
 Note: Because VarUInts depend on end tags to indicate their lengths,
@@ -847,8 +851,8 @@ The following table enumerates the illegal type descriptors in Ion
                             0e0 and null.float are represented with L
                             equal to 0 and 15, respectively.
 
-   5   [0-1]                For timestamp values, a VarInt offset and
-                            VarUInt year are required. Thus, type code 5
+   6   [0-1]                For timestamp values, a VarInt offset and
+                            VarUInt year are required. Thus, type code 6 
                             with L equal to zero or one is illegal.
 
    14  [0]*,[1-2],[15]      Annotation wrappers must have one
