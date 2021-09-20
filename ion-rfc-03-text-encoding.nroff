@@ -2,9 +2,10 @@
 .ti 0
 3. Ion Text Encoding
 
-TODO: provide a preamble about text encoding
+The Ion text encoding is easily human readable and writable. It is similar
+to JSON with additional types, annotations, and C-style line comments.
 
-The ion text encoding is a value stream which must be a valid sequence
+Ion text encoding is a value stream which must be a valid sequence
 of Unicode code points in any of the three encoding forms (i.e. UTF-8,
 UTF-16, or UTF-32).
 
