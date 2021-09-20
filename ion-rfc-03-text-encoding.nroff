@@ -43,9 +43,6 @@ same characters as a symbol, they must be enclosed in single-quotes:
    null.list   // The type is list
    'null.int'  // The type is symbol
 
-(As a historical aside, the null type exists primarily for compatibility
-with JSON, which has only the untyped null value.)
-
 
 .tm _  3.2. Booleans .................................................. \n%
 .ti 0
