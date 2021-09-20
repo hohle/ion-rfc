@@ -145,7 +145,10 @@ Symbols are case sensitive.
 Symbols may be shared between applications out of band or stored
 separately from data at rest using symbol tables.
 
-TODO: differentiate symbol from symbol token
+Symbols can be used in two different ways, as values or as symbol tokens.
+A symbol value can appear anywhere a value can occur, and can be
+annotated like any other value. A symbol token is a symbol used as an
+annotation or as a field name in a struct, and cannot be annotated.
 
 .tm _     2.1.8. Blobs ................................................ \n%
 .ti 0
