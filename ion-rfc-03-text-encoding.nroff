@@ -298,14 +298,14 @@ Unicode Code Point    Ion Escape    Meaning
 \&U+0008                \\b            backspace BS
 \&U+0009                \\t            horizontal tab HT
 \&U+000A                \\n            linefeed LF
+\&U+000B                \\v            vertical tab VT
 \&U+000C                \\f            form feed FF
 \&U+000D                \\r            carriage return CR
-\&U+000B                \\v            vertical tab VT
 \&U+0022                \\"            double quote
 \&U+0027                \\'            single quote
+\&U+002F                \\/            forward slash
 \&U+003F                \\?            question mark
 \&U+005C                \\\\            backslash
-\&U+002F                \\/            forward slash
 \&nothing               \\NL           escaped NL expands to nothing
 \&U+00HH                \\xHH          2-digit hexadecimal Unicode
                                     code point
