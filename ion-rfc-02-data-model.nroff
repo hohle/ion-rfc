@@ -66,11 +66,8 @@ booleans, numbers, timestamps, character sequences, and symbols.
 .ti 0
 2.1.1 Null Values
 
-Ion supports distinct null values for every core type, as well as a
-separate null type that's distinct from all other types.
-
-Null values exist for all core types, including the null type. The null
-type has a single value, null.
+Ion supports a distinct null value for every core type. The null type has a
+single value, null.
 
 As a historical aside, the null type exists primarily for compatibility
 with JSON, which has only the untyped null value.
