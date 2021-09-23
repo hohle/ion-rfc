@@ -621,7 +621,7 @@ Zero-length blobs are legal, so L may be zero.
 The representation fields of a list value are simply nested Ion values.
 
 When L is 15, the value is null.list and there's no length or nested
-values. When L is 0, the value is an empty list, and there''s no length
+values. When L is 0, the value is an empty list, and there's no length
 or nested values.
 
 Because values indicate their total lengths in octets, it is possible to
