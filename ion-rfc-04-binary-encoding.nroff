@@ -507,8 +507,8 @@ has a fraction_exponent and fraction_coefficient component but not the
 month component, is illegal.
 
 Note: The component values in the binary encoding are always in UTC,
-while components in the text encoding are in the local time! This means
-    that transcoding requires a conversion between UTC and local time.
+      while components in the text encoding are in the local time! This means
+      that transcoding requires a conversion between UTC and local time.
 
 .tm _     4.2.7. 7: Symbols ........................................... \n%
 .ti 0
