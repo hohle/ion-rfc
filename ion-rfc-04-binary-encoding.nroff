@@ -392,11 +392,10 @@ o If L is 0, then the the value is 0e0 and representation is empty.
 o  If L is 15, then the value is null.float and the representation is
    empty.
 
-   Note: Ion 1.0 only supports 32-bit and 64-bit float values (i.e. L
-         size 4 or 8), but future versions of the standard may support
-         16-bit and 128-bit float values.
-
 .in 3
+Note: Ion 1.0 only supports 32-bit and 64-bit float values (i.e. L
+      size 4 or 8), but future versions of the standard may support
+      16-bit and 128-bit float values.
 
 .tm _     4.2.5. 5: Decimals .......................................... \n%
 .ti 0
