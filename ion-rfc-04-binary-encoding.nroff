@@ -693,11 +693,6 @@ o When L is 15, the value is null.struct, and there's no length or
   nested fields.
 
 .ti 6
-o When 1 < L < 14 then there is no length field as L is enough to
-  represent the struct size, and no assertion is made about
-  field ordering.
-
-.ti 6
 o Otherwise, 1 < L < 14  and there is no length field as _L_ is enough to
   represent the struct size. No assertion is made about field ordering.
 
