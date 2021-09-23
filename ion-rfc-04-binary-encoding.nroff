@@ -345,7 +345,7 @@ store the magnitude.
 Zero is always stored as positive; negative zero is illegal.
 
 If L is 0 the value is zero, and there are no length or magnitude
-subfields. As a result, when T is 3, both L_ and the magnitude subfield
+subfields. As a result, when T is 3, both L and the magnitude subfield
 must be non-zero.
 
 With either type code 2 or 3, if L is 15, then the value is null.int and
