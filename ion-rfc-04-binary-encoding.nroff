@@ -29,7 +29,6 @@ which contain the actual data. These values are generally referred to as
 
 .KS
 .nf
-                 31                      0
                 +-------------------------+
    value stream |  binary version marker  |
                 +-------------------------+
@@ -83,7 +82,7 @@ indicates the number of octets in the field.
               +=========================+
               :          bits           :
               +=========================+
-               n+7                     n
+               7                       0
 .KE
 
 .in 3
@@ -105,7 +104,7 @@ UInts are sequences of octets, interpreted as big-endian.
               +=========================+
               :          bits           :
               +=========================+
-               n+7                     n
+                7  6                   0
 .KE
 
 .in 3
@@ -133,7 +132,7 @@ terminate the field.
    VarUInt field : 0 :         bits        :
                  +===+=====================+     
                              ⋮
-                  n+7 n+6                 n
+                   7  6                   0      
                  +---+---------------------+
                  | 1 |         bits        |
                  +---+---------------------+
@@ -146,7 +145,7 @@ must be zero.
 
 .KS
 .nf
-                  7   6  5               0        n+7 n+6                 n
+                  7   6  5               0         7   6  5               0
                 +===+                            +---+
    VarInt field : 0 :       payload         ...  | 1 |       payload
                 +===+                            +---+
@@ -236,15 +235,15 @@ o If the representation is at least 14 bytes long, then L is set to 14,
 and the length field is set to the representation length, encoded as a
 VarUInt field.
 
-.tm _     4.2.1. 0: Nulls ............................................. \n%
-.ti 0
+.tm _     4.2.1. 0x0: Nulls ........................................... \n%
+.ti 0x0
 4.2.1. 0: Nulls
 
 .KS
 .nf
               7       4 3       0
               +---------+---------+
-   Null value |    0    |    15   |
+   Null value |   0x0   |   0xF   |
               +---------+---------+
 .KE
 
@@ -259,7 +258,7 @@ null.null.
 .nf
             7       4 3       0
            +---------+---------+
-   NOP Pad |    0    |    L    |
+   NOP Pad |   0x0   |    L    |
            +---------+---------+======+
            :     length [VarUInt]     :
            +--------------------------+
@@ -303,15 +302,15 @@ NOP padding is valid anywhere a value can be encoded, except for within
 an annotation wrapper. NOP padding in struct requires additional
 encoding considerations.
 
-.tm _     4.2.2. 1: Booleans .......................................... \n%
+.tm _     4.2.2. 0x1: Booleans ........................................ \n%
 .ti 0
-4.2.2. 1: Booleans
+4.2.2. 0x1: Booleans
 
 .KS
 .nf
                7       4 3       0
               +---------+---------+
-   Bool value |    1    |   rep   |
+   Bool value |   0x1   |   rep   |
               +---------+---------+
 .KE
 
@@ -321,9 +320,9 @@ is stored in the typedesc itself (rather than after the typedesc). A
 representation of 0 means false; a representation of 1 means true; and a
 representation of 15 means null.bool.
 
-.tm _     4.2.3. 2 & 3: Integers ...................................... \n%
+.tm _     4.2.3. 0x2 & 0x3: Integers .................................. \n%
 .ti 0
-4.2.3. 2 & 3: Integers
+4.2.3. 0x2 & 0x3: Integers
 
 Values of type int are stored using two type codes: 2 for positive
 values and 3 for negative values. Both codes use a UInt subfield to
@@ -333,7 +332,7 @@ store the magnitude.
 .nf
               7       4 3       0
              +---------+---------+
-   Int value |  2 or 3 |    L    |
+   Int value | 0x2/0x3 |    L    |
              +---------+---------+======+
              :     length [VarUInt]     :
              +==========================+
@@ -352,15 +351,15 @@ With either type code 2 or 3, if L is 15, then the value is null.int and
 the magnitude is empty. Note that this implies there are two equivalent
 binary representations of null integer values.
 
-.tm _     4.2.4. 4: Floats ............................................ \n%
+.tm _     4.2.4. 0x4: Floats .......................................... \n%
 .ti 0
-4.2.4. 4: Floats
+4.2.4. 0x4: Floats
 
 .KS
 .nf
                  7       4 3       0
                +---------+---------+
-   Float value |    4    |    L    |
+   Float value |   0x4   |    L    |
                +---------+---------+-----------+
                |   representation [IEEE-754]   |
                +-------------------------------+
@@ -397,15 +396,15 @@ Note: Ion 1.0 only supports 32-bit and 64-bit float values (i.e. L
       size 4 or 8), but future versions of the standard may support
       16-bit and 128-bit float values.
 
-.tm _     4.2.5. 5: Decimals .......................................... \n%
+.tm _     4.2.5. 0x5: Decimals ........................................ \n%
 .ti 0
-4.2.5. 5: Decimals
+4.2.5. 0x5: Decimals
 
 .KS
 .nf
                   7       4 3       0
                  +---------+---------+
-   Decimal value |    5    |    L    |
+   Decimal value |   0x5   |    L    |
                  +---------+---------+======+
                  :     length [VarUInt]     :
                  +--------------------------+
@@ -429,15 +428,15 @@ If the value is 0. (aka 0d0) then L is zero, there are no length or
 representation fields, and the entire value is encoded as the single
 byte 0x50.
 
-.tm _     4.2.6. 6: Timestamps ........................................ \n%
+.tm _     4.2.6. 0x6: Timestamps ...................................... \n%
 .ti 0
-4.2.6. 6: Timestamps
+4.2.6. 0x6: Timestamps
 
 .KS
 .nf
                     7       4 3       0
                    +---------+---------+
-   Timestamp value |    6    |    L    |
+   Timestamp value |   0x6   |    L    |
                    +---------+---------+========+
                    :      length [VarUInt]      :
                    +----------------------------+
@@ -510,15 +509,15 @@ Note: The component values in the binary encoding are always in UTC,
       while components in the text encoding are in the local time! This means
       that transcoding requires a conversion between UTC and local time.
 
-.tm _     4.2.7. 7: Symbols ........................................... \n%
+.tm _     4.2.7. 0x7: Symbols ......................................... \n%
 .ti 0
-4.2.7. 7: Symbols
+4.2.7. 0x7: Symbols
 
 .KS
 .nf
                  7       4 3       0
                 +---------+---------+
-   Symbol value |    7    |    L    |
+   Symbol value |   0x7   |    L    |
                 +---------+---------+======+
                 :     length [VarUInt]     :
                 +--------------------------+
@@ -534,15 +533,15 @@ symbol ID is zero and the length and symbol ID fields are omitted.
 See Ion Symbols for more details about symbol representations and
 symbol tables
 
-.tm _     4.2.8. 8: Strings ........................................... \n%
+.tm _     4.2.8. 0x8: Strings ......................................... \n%
 .ti 0
-4.2.8. 8: Strings
+4.2.8. 0x8: Strings
 
 .KS
 .nf
                  7       4 3       0
                 +---------+---------+
-   String value |    8    |    L    |
+   String value |   0x8   |    L    |
                 +---------+---------+======+
                 :     length [VarUInt]     :
                 +==========================+
@@ -555,15 +554,15 @@ These are always sequences of Unicode characters, encoded as a sequence
 of UTF-8 octets. If L is zero then the string is the empty string "" and
 the length and representation fields are omitted.
 
-.tm _     4.2.9. 9: Clobs ............................................. \n%
+.tm _     4.2.9. 0x9: Clobs ........................................... \n%
 .ti 0
-4.2.9. 9: Clobs
+4.2.9. 0x9: Clobs
 
 .KS
 .nf
                7       4 3       0
               +---------+---------+
-   Clob value |    9    |    L    |
+   Clob value |   0x9   |    L    |
               +---------+---------+======+
               :     length [VarUInt]     :
               +==========================+
@@ -578,15 +577,15 @@ the application).
 
 Zero-length clobs are legal, so L may be zero.
 
-.tm _     4.2.10. 10: Blobs ........................................... \n%
+.tm _     4.2.10. 0xA: Blobs .......................................... \n%
 .ti 0
-4.2.10. 10: Blobs
+4.2.10. 0xA: Blobs
 
 .KS
 .nf
                7       4 3       0
               +---------+---------+
-   Blob value |   10    |    L    |
+   Blob value |   0xA   |    L    |
               +---------+---------+======+
               :     length [VarUInt]     :
               +==========================+
@@ -600,15 +599,15 @@ the application).
 
 Zero-length blobs are legal, so L may be zero.
 
-.tm _     4.2.11. 11: Lists ........................................... \n%
+.tm _     4.2.11. 0xB: Lists .......................................... \n%
 .ti 0
-4.2.11. 11: Lists
+4.2.11. 0xB: Lists
 
 .KS
 .nf
                7       4 3       0
               +---------+---------+
-   List value |   11    |    L    |
+   List value |   0xB   |    L    |
               +---------+---------+======+
               :     length [VarUInt]     :
               +==========================+
@@ -627,15 +626,15 @@ or nested values.
 Because values indicate their total lengths in octets, it is possible to
 locate the beginning of each successive value in constant time.
 
-.tm _     4.2.12. 12: S-Expressions ................................... \n%
+.tm _     4.2.12. 0xC: S-Expressions .................................. \n%
 .ti 0
-4.2.12. 12: S-Expressions
+4.2.12. 0xC: S-Expressions
 
 .KS
 .nf
                7       4 3       0
               +---------+---------+
-   Sexp value |   12    |    L    |
+   Sexp value |   0xC   |    L    |
               +---------+---------+======+
               :     length [VarUInt]     :
               +==========================+
@@ -648,9 +647,9 @@ locate the beginning of each successive value in constant time.
 Values of type sexp are encoded exactly as are list values, except with
 a different type code.
 
-.tm _     4.2.13. 13: Structures ...................................... \n%
+.tm _     4.2.13. 0xD: Structures ..................................... \n%
 .ti 0
-4.2.13. 13: Structures
+4.2.13. 0xD: Structures
 
 Structs are encoded as sequences of symbol/value pairs. Since all
 symbols are encoded as positive integers, we can omit the typedesc on
@@ -660,7 +659,7 @@ the field names and just encode the integer value.
 .nf
                  7       4 3       0
                 +---------+---------+
-   Struct value |   13    |    L    |
+   Struct value |   0xD   |    L    |
                 +---------+---------+======+
                 :     length [VarUInt]     :
                 +======================+===+==================+
@@ -755,9 +754,9 @@ NOP pad, which is not allowed generally for annotations:
 
 .in 3
 
-.tm _     4.2.14. 14: Type Annotations ................................ \n%
+.tm _     4.2.14. 0xE: Type Annotations ............................... \n%
 .ti 0
-4.2.14. 14: Type Annotations
+4.2.14. 0xE: Type Annotations
 
 This special type code doesn't map to an Ion value type, but instead is
 a wrapper used to associate annotations with content.
@@ -770,7 +769,7 @@ symbol IDs.
 .nf
                        7       4 3       0
                       +---------+---------+
-   Annotation wrapper |   14    |    L    |
+   Annotation wrapper |   0xE   |    L    |
                       +---------+---------+======+
                       :     length [VarUInt]     :
                       +--------------------------+
@@ -810,11 +809,11 @@ Note: Because L cannot be zero, the octet 0xE0 is not a valid type
 descriptor. Instead, that octet signals the start of a binary
 version marker.
 
-.tm _     4.2.15. 15: Reserved ........................................ \n%
+.tm _     4.2.15. 0xF: Reserved ....................................... \n%
 .ti 0
-4.2.15. 15: Reserved
+4.2.15. 0xF: Reserved
 
-The remaining type code, 15, is reserved for future use and is not legal
+The remaining type code, 0xF, is reserved for future use and is not legal
 in Ion 1.0 data.
 
 .tm _  4.3. Illegal Type Descriptors .................................. \n%
@@ -832,24 +831,24 @@ The following table enumerates the illegal type descriptors in Ion
 .nf
    T   L                    Reason
 
-   1   [2-14]               For bool values, L is used to encode the
+  0x1  [2-14]               For bool values, L is used to encode the
                             value, and may be 0 (false), 1 (true), or 15
                             (null.bool).
 
-   3   [0]                  The int 0 is always stored with type code 2.
+  0x3  [0]                  The int 0 is always stored with type code 2.
                             Thus, type code 3 with L equal to zero
                             is illegal.
 
-   4   [1-3],[5-7],[9-14]   For float values, only 32-bit and 64-bit
+  0x4  [1-3],[5-7],[9-14]   For float values, only 32-bit and 64-bit
                             IEEE-754 values are supported. Additionally,
                             0e0 and null.float are represented with L
                             equal to 0 and 15, respectively.
 
-   6   [0-1]                For timestamp values, a VarInt offset and
+  0x6  [0-1]                For timestamp values, a VarInt offset and
                             VarUInt year are required. Thus, type code 6 
                             with L equal to zero or one is illegal.
 
-   14  [0]*,[1-2],[15]      Annotation wrappers must have one
+  0xE  [0]*,[1-2],[15]      Annotation wrappers must have one
                             annot_length field, at least one annot
                             field, and exactly one value field. Null
                             annotation wrappers are illegal.
@@ -860,6 +859,6 @@ The following table enumerates the illegal type descriptors in Ion
                             parsing errors when it is not followed by
                             the rest of the BVM octet sequence.
 
-   15  [0-15]               The type code 15 is illegal in Ion 1.0 data.
+  0xF  [0-15]               The type code 15 is illegal in Ion 1.0 data.
 .in 3
 
