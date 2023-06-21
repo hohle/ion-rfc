@@ -392,7 +392,8 @@ o Is terminated by an incorrect number of padding characters.
 .in 3
 
 Within blob values, whitespace is ignored and comments are not allowed.
-The / character is always considered part of the Base64 data.
+The / character is always considered part of the Base64 data and the
+* character is invalid for Base64 encoding.
 
 .nf
     // A null blob value
