@@ -382,7 +382,7 @@ There are two exceptions for the L field:
 
 .in 9
 .ti 6
-o If L is 0, then the the value is 0e0 and representation is empty.
+o If L is 0, then the value is 0e0 and representation is empty.
 
   Note: This is not to be confused with -0e0 which is a distinct value
         and in current Ion must be encoded as a normal IEEE float
@@ -428,6 +428,19 @@ present (that is, it has zero length) when the coefficient's value is
 
 If L is zero the value is `0`, and there are no length, exponent, or
 coefficient subfields.
+
+There are two exceptions for the L field:
+
+.in9
+.ti 6
+1. If L is 0, then the value is `0.` (aka `0d0`), and there are no length,
+      exponent, or coefficient subfields.
+
+.ti 6
+2. If L is 15, then the value is `null.decimal` and there are no length,
+      exponent, or coefficient subfields.
+
+.in 3
 
 .tm _     4.2.6. 6: Timestamps ........................................ \n%
 .ti 0
