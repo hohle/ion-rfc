@@ -3,8 +3,7 @@
 3. Ion Text Encoding
 
 The ion text encoding is a value stream which must be a valid sequence
-of Unicode code points in any of the three encoding forms (i.e. UTF-8,
-UTF-16, or UTF-32). It shares many similarities to JSON, and in fact, is
+of UTF-8 code points. It shares many similarities to JSON, and in fact, is
 a proper superset of JSON. Ion extends JSON with additional datatypes,
 syntax, containers, and annotations.
 
