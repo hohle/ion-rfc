@@ -535,11 +535,14 @@ pure sequence-of-values data model indicated above.
 3.14. Type Annotations
 
 In the text format, type annotations are denoted by a non-null symbol
-token and double-colons preceding any content:
+token and double-colons preceding any value. Multiple annotations on
+the same value are separated by double-colons:
 
 .nf
    int32::12                                // Suggests 32 bits as
                                             // end-user type
+   degrees::'celsius'::100                  // you can have multiple
+                                            // annotations on a value
    'my.custom.type' :: { x : 12 , y : -1 }  // Gives a struct a
                                             // user-defined type
 
