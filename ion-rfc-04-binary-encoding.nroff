@@ -426,9 +426,8 @@ representation minus the length of exponent. The subfield should not be
 present (that is, it has zero length) when the coefficient's value is
 (positive) zero.
 
-If the value is 0. (aka 0d0) then L is zero, there are no length or
-representation fields, and the entire value is encoded as the single
-byte 0x50.
+If L is zero the value is `0`, and there are no length, exponent, or
+coefficient subfields.
 
 .tm _     4.2.6. 6: Timestamps ........................................ \n%
 .ti 0
