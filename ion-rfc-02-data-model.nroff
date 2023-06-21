@@ -64,7 +64,7 @@ booleans, numbers, timestamps, character sequences, and symbols.
 
 .tm _     2.1.1. Null Values .......................................... \n%
 .ti 0
-2.1.1 Null Values
+2.1.1. Null Values
 
 Ion supports distinct null values for every core type, as well as a
 separate null type that's distinct from all other types.
@@ -77,26 +77,26 @@ with JSON, which has only the untyped null value.
 
 .tm _     2.1.2. Boolean .............................................. \n%
 .ti 0
-2.1.2 Booleans
+2.1.2. Booleans
 
 The bool type may have a value of true, false, or, null.
 
 .tm _     2.1.3. Integers ............................................. \n%
 .ti 0
-2.1.3 Integers
+2.1.3. Integers
 
 The int type consists of signed integers of arbitrary size.
 
 .tm _     2.1.4. Real Numbers ......................................... \n%
 .ti 0
-2.1.4 Real Numbers
+2.1.4. Real Numbers
 
 Ion supports both binary and lossless decimal encodings of real numbers
 as, respectively, types float and decimal.
 
 .tm _        2.1.4.1. Float ........................................... \n%
 .ti 0
-2.1.4.1 Floats
+2.1.4.1. Floats
 
 The float type denotes either 32-bit or 64-bit IEEE-754 floating-point
 values; other sizes may be supported in future versions of this
@@ -104,7 +104,7 @@ specification.
 
 .tm _        2.1.4.2. Decimal ......................................... \n%
 .ti 0
-2.1.4.2 Decimals
+2.1.4.2. Decimals
 
 Because most decimal values cannot be represented exactly in binary
 floating-point, float values may change "appearance" and precision when
@@ -114,7 +114,7 @@ round-trips.
 
 .tm _     2.1.5. Timestamps ........................................... \n%
 .ti 0
-2.1.5 Timestamps
+2.1.5. Timestamps
 
 Timestamps represent a specific moment in time, always include a local
 offset, and are capable of arbitrary precision.
@@ -132,13 +132,13 @@ with the same offset and precision.
 
 .tm _     2.1.6. Strings .............................................. \n%
 .ti 0
-2.1.6 Strings
+2.1.6. Strings
 
 Ion string values are Unicode character sequences of arbitrary length.
 
 .tm _     2.1.7. Symbols .............................................. \n%
 .ti 0
-2.1.7 Symbols
+2.1.7. Symbols
 
 Symbols are much like strings, in that they are Unicode character
 sequences. The primary difference is the intended semantics: symbols
@@ -151,7 +151,7 @@ Symbol text to a unique integer token.
 
 .tm _     2.1.8. Blobs ................................................ \n%
 .ti 0
-2.1.8 Blobs
+2.1.8. Blobs
 
 The blob type allows embedding of arbitrary raw binary data. Ion treats
 such data as a single (though often very large) value. It does no
@@ -159,7 +159,7 @@ processing of such data other than passing it through intact.
 
 .tm _     2.1.9. Clobs ................................................ \n%
 .ti 0
-2.1.9 Clobs
+2.1.9. Clobs
 
 The clob type is similar to blob in that it holds uninterpreted binary
 data, the difference is that the content is expected to be text. Like
@@ -177,7 +177,7 @@ Ion type.
 
 .tm _     2.2.1. Structures ........................................... \n%
 .ti 0
-2.2.1 Structures
+2.2.1. Structures
 
 Structures are unordered collections of name/value pairs. The names are
 symbol tokens, and the values are unrestricted. Each name/value pair is
@@ -251,7 +251,7 @@ symbol values. That means they do not have annotations themselves.
 
 .tm _  2.3. Value Streams ............................................. \n%
 .ti 0
-2.3 Value Streams
+2.3. Value Streams
 
 A value stream is a (potentially unbounded) sequence of Ion values in
 either text or binary.

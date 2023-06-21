@@ -38,7 +38,7 @@ before accessing the values.
 
 .tm _   1.1 Conventions Used in This Document  ........................ \n%
 .ti 0
-1.1 Conventions Used in This Document
+1.1. Conventions Used in This Document
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this

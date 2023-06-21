@@ -10,7 +10,7 @@ As of the date of this writing, the Unicode Standard is on
 
 .tm 6.1 Unicode Primer ................................................ \n%
 .ti 0
-6.1 Unicode Primer
+6.1. Unicode Primer
 
 The Unicode standard specifies a large set of code points, the Universal
 Character Set (UCS), which is an integer in the range of 0 (0x0) through
@@ -44,7 +44,7 @@ sections [3.8 and 3.9 of the Unicode Standard][5] for details.
 
 .tm _  6.1. Ion String ................................................ \n%
 .ti 0
-6.2 Ion String
+6.2. Ion String
 
 The Ion String data type is a sequence of Unicode code points. The Ion
 semantics of this are agnostic to any particular Unicode encoding (e.g.
@@ -53,7 +53,7 @@ binary and text formats.
 
 .tm _     6.2.1. Text Format  ......................................... \n%
 .ti 0
-6.2.1 Text Format
+6.2.1. Text Format
 
 See the [grammar][6] for a formal definition of the Ion Text encoding for
 the string type.
@@ -154,7 +154,7 @@ sequences.
 
 .tm _     6.2.2. Binary Format  ....................................... \n%
 .ti 0
-6.2.2 Binary Format
+6.2.2. Binary Format
 
 The Ion binary format encodes the string data type directly as a sequence
 of UTF-8 octets. A strict, Unicode compliant implementation of Ion should
@@ -163,7 +163,7 @@ values, and values outside of the inclusive range, U+0000 to U+0010FFFF).
 
 .tm 6.3 Ion Clob ...................................................... \n%
 .ti 0
-6.3 Ion Clob
+6.3. Ion Clob
 
 An Ion clob type is similar to the blob type except that the denotation in
 the Ion text format uses an ASCII-based string notation rather than a

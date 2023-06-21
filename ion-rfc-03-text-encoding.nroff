@@ -9,7 +9,7 @@ syntax, containers, and annotations.
 
 .tm _  3.1. Nulls  .................................................... \n%
 .ti 0
-3.1.1 Nulls
+3.1.1. Nulls
 
 The null type has a single value, denoted in the text format by the
 keyword `null'. Null values for all core types are denoted by suffixing
@@ -66,7 +66,7 @@ them to be parsed as symbols.)
 
 .tm _  3.3. Integers .................................................. \n%
 .ti 0
-3.3 Integers
+3.3. Integers
 
 The text format allows hexadecimal and binary (but not octal) notation,
 but such notation will not be maintained during binary-to-text
@@ -162,7 +162,7 @@ significant and is preserved through round-trips.
 
 .tm _  3.6. Timestamps ................................................ \n%
 .ti 0
-3.6 Timestamps
+3.6. Timestamps
 
 In the text format, timestamps follow the W3C note on date and time
 formats, but they must end with the literal "T" if not at least
@@ -254,7 +254,7 @@ C/Java backslash-escape conventions (see below).
 
 .tm _     3.7.1 Long Strings .......................................... \n%
 .ti 0
-3.7.1 Long Strings
+3.7.1. Long Strings
 
 The text format supports an alternate syntax for "long strings",
 including those that break across lines. Sequences bounded by three

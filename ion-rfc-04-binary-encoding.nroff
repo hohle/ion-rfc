@@ -253,7 +253,9 @@ Values of type null always have empty lengths and representations. The
 only valid L value is 15, representing the only value of this type,
 null.null.
 
-4.2.1.1 NOP Padding
+.tm _        4.2.1.1. NOP Padding ..................................... \n%
+.ti 0
+4.2.1.1. NOP Padding
 
 .KS
 .nf

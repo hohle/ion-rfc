@@ -80,7 +80,7 @@ or (2) encountering a local symbol table at the top-level.
 
 .tm _     5.1.1. The Catalog .......................................... \n%
 .ti 0
-5.1.1 The Catalog
+5.1.1. The Catalog
 
 This specification refers to a "catalog". That's simply an abstraction
 for the set of available Ion shared symbol tables. It's not necessarily
