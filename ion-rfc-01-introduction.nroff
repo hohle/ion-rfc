@@ -27,8 +27,9 @@ and comments.)
 The Ion text encoding is intended to be easy to read and write. It may
 be more suitable for streaming applications since sequences don't need
 to be length-prefixed. Whitespace is insignificant and is only required
-where necessary to separate tokens. C-style comments are treated as
-whitespace, and are not part of the binary encoding.
+where necessary to separate tokens. C-style comments (either block or
+inline) are treated as whitespace, and are not part of the
+binary encoding.
 
 The binary encoding is much more compact and efficient. An important
 feature is that parts of the whole can be accessed without

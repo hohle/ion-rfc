@@ -17,9 +17,10 @@ SOURCES = \
 	  ion-rfc-04-binary-encoding.nroff \
 	  ion-rfc-05-symbols.nroff \
 	  ion-rfc-06-stringclob.nroff \
-	  ion-rfc-07-compression.nroff \
-	  ion-rfc-08-security-considerations.nroff \
-	  ion-rfc-09-iana-considerations.nroff \
+	  ion-rfc-07-real-numbers.nroff \
+	  ion-rfc-08-compression.nroff \
+	  ion-rfc-09-security-considerations.nroff \
+	  ion-rfc-10-iana-considerations.nroff \
 	  ion-rfc-appendix.nroff \
 	  ion-rfc-references.nroff
 
@@ -33,9 +34,10 @@ SPELL_OUTPUT = \
 	  ion-rfc-04-binary-encoding.sc \
 	  ion-rfc-05-symbols.sc \
 	  ion-rfc-06-stringclob.sc \
-	  ion-rfc-07-compression.sc \
-	  ion-rfc-08-security-considerations.sc \
-	  ion-rfc-09-iana-considerations.sc \
+	  ion-rfc-07-real-numbers.sc \
+	  ion-rfc-08-compression.sc \
+	  ion-rfc-09-security-considerations.sc \
+	  ion-rfc-10-iana-considerations.sc \
 	  ion-rfc-appendix.sc \
 	  ion-rfc-references.sc
 

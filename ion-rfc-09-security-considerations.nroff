@@ -1,6 +1,6 @@
-.tm 8. Security Considerations ........................................ \n%
+.tm 9. Security Considerations ........................................ \n%
 .ti 0
-8.  Security Considerations
+9.  Security Considerations
 
 Unlike JSON, Ion is not a subset of an existing programming logic and
 cannot be "eval()"-ed. However, Ion data can represent an application
