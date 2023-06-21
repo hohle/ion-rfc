@@ -110,32 +110,32 @@ symbol forms.
 .nf
     Unicode Code Point     Ion Escape     Semantics
 
-    U+0007                 \a             BEL (alert)
-    U+0008                 \b             BS (backspace)
-    U+0009                 \t             HT (tab)
-    U+000A                 \n             LF (linefeed)
-    U+000C                 \f             FF (form feed)
-    U+000D                 \r             CR (carriage return)
-    U+000B                 \v             VT (vertical tab)
-    U+0022                 \"             double quote
-    U+0027                 \'             single quote
-    U+003F                 \?             question mark
-    U+005C                 \\             backslash
-    U+002F                 \/             forward slash
-    U+0000                 \0             NUL (null character)
+    U+0007                 \\a             BEL (alert)
+    U+0008                 \\b             BS (backspace)
+    U+0009                 \\t             HT (tab)
+    U+000A                 \\n            LF (linefeed)
+    U+000C                 \\f             FF (form feed)
+    U+000D                 \\r             CR (carriage return)
+    U+000B                 \\v             VT (vertical tab)
+    U+0022                 \\"             double quote
+    U+0027                 \\'             single quote
+    U+003F                 \\?             question mark
+    U+005C                 \\\\             backslash
+    U+002F                 \\/             forward slash
+    U+0000                 \\0             NUL (null character)
 
 .in 3
-The for the Unicode ordinal string escapes, \U, \u, and \x, the escape must
+The for the Unicode ordinal string escapes, \U, \u, and \\x, the escape must
 be followed by a number of hexadecimal digits as described below.
 
 .nf
     Unicode        Ion
-    Code Point     Sequnence      Semantics
+    Code Point     Sequence       Semantics
 
     U+HHHHHHHH     \UHHHHHHHH     8-digit hexadecimal Unicode code point
     U+HHHH         \uHHHH         4-digit hexadecimal Unicode code point;
                                   equivalent to \U0000HHHH
-    U+00HH         \xHH           2-digit hexadecimal Unicode code point;
+    U+00HH         \\xHH           2-digit hexadecimal Unicode code point;
                                   equivalent to \u00HH and \U000000HH
 
 .in 3
@@ -199,28 +199,28 @@ replacement for both all strings.
 
 .nf
     Octet     Ion Escape     Semantics
-    0x07      \a             ASCII BEL (alert)
-    0x08      \b             ASCII BS (backspace)
-    0x09      \t             ASCII HT (tab)
-    0x0A      \n             ASCII LF (line feed)
-    0x0C      \f             ASCII FF (form feed)
-    0x0D      \r             ASCII CR (carriage return)
-    0x0B      \v             ASCII VT (vertical tab)
-    0x22      \"             ASCII double quote
-    0x27      \'             ASCII single quote
-    0x3F      \?             ASCII question mark
-    0x5C      \\             ASCII backslash
-    0x2F      \/             ASCII forward slash
-    0x00      \0             ASCII NUL (null character)
+    0x07      \\a             ASCII BEL (alert)
+    0x08      \\b             ASCII BS (backspace)
+    0x09      \\t             ASCII HT (tab)
+    0x0A      \\n             ASCII LF (line feed)
+    0x0C      \\f             ASCII FF (form feed)
+    0x0D      \\r             ASCII CR (carriage return)
+    0x0B      \\v             ASCII VT (vertical tab)
+    0x22      \\"             ASCII double quote
+    0x27      \\'             ASCII single quote
+    0x3F      \\?             ASCII question mark
+    0x5C      \\\\             ASCII backslash
+    0x2F      \\/             ASCII forward slash
+    0x00      \\0             ASCII NUL (null character)
 
 .in 3
-The clob escape \x must be followed by two hexadecimal digits. Note that
+The clob escape \\x must be followed by two hexadecimal digits. Note that
 clob does not support the \u and \U escapes since it represents an octet
 sequence and not a Unicode encoding.
 
 .nf
     Octet     Ion Escape     Semantics
-    0xHH      \xHH           2-digit hexadecimal octet
+    0xHH      \\xHH           2-digit hexadecimal octet
 
 .in 3
 It is important to note that clob is a binary type that is designed for
@@ -228,7 +228,7 @@ binary values that are either text encoded in a code page that is ASCII
 compatible or should be octet editable by a human (escaped string syntax
 vs. base64 encoded data). Clearly non-ASCII based encodings will not be
 very readable (e.g. the clob for the EBCDIC encoded string representing
-"hello" could be denoted as {{ "\xc7\xc1%%?" }}).
+"hello" could be denoted as {{ "\\xc7\\xc1%%?" }}).
 
 .tm _     6.3.2. Binary Format  ....................................... \n%
 .ti 0

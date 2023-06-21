@@ -1,0 +1,8 @@
+# output
+ion-rfc.txt
+ion-rfc.pdf
+
+# intermediate files
+toc.input
+aspell-dict
+*.sc

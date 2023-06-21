@@ -1,0 +1,36 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           github 1.0
+
+
+github.setup		hohle ion-rfc main
+github.tarball_from archive
+revision			0
+name                ion-rfc
+categories          lang
+platforms           darwin
+license             Proprietary
+maintainers         {hohle @hohle}
+description         An RFC for the Ion specification
+long_description    ${name} provides Troff sources to create the Ion RFC
+
+checksums           rmd160  54c2710ee6d35ee14d891968ccfb6c3fab40c469 \
+                    sha256  56341328a889c22662965b32ef57e9217f64c8513672bc9b3d79488f6bcf69c8 \
+                    size    34161
+
+depends_build       port:aspell \
+                    port:aspell-dict-en \
+                    port:enscript \
+                    port:groff
+
+use_configure no
+
+build {
+    system "cd ${worksrcpath}; make"
+}
+
+destroot {
+    xinstall -m 0555 "${worksrcpath}/ion-rfc.txt" "${destroot}${prefix}/share/ion/ion-rfc.txt"
+    xinstall -m 0555 "${worksrcpath}/ion-rfc.pdf" "${destroot}${prefix}/share/ion/ion-rfc.pdf"
+}

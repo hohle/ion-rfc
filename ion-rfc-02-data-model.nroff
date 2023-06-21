@@ -146,9 +146,8 @@ represent semantic identifiers as opposed to textual literal values.
 Symbols are case sensitive.
 
 Symbols may be shared between applications out of band or stored
-separately from data at rest using symbol tables.
-
-TODO: differentiate symbol from symbol token
+separately from data at rest using symbol tables. Symbol tables map
+Symbol text to a unique integer token.
 
 .tm _     2.1.8. Blobs ................................................ \n%
 .ti 0

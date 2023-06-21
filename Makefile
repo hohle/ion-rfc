@@ -85,10 +85,10 @@ check-spelling: $(SPELL_OUTPUT)
 	$(call print_target)
 
 .SUFFIXES: .sc
-$(SPELL_OUTPUT): $(.PREFIX).nroff $(OUTPUT_DICT)
+%.sc: %.nroff $(OUTPUT_DICT)
 	$(call print_target)
 
-	@cat $(.PREFIX).nroff | \
+	cat $< | \
 	    aspell list \
 	    --mode nroff \
 	    --lang="$(LANG)" \
@@ -96,12 +96,12 @@ $(SPELL_OUTPUT): $(.PREFIX).nroff $(OUTPUT_DICT)
 	    -a | \
 	    sort -u | \
 	    tee $@ | \
-	    xargs -n 1 printf "\\033[0;31m$(.PREFIX).nroff >>>\033[0m %s\n"
+	    xargs -n 1 printf "\\033[0;31m$< >>>\033[0m %s\n"
 
 $(OUTPUT_DICT): $(DICT)
 	$(call print_target)
 
-	aspell --lang="$(LANG)" create master "./$@" < $(.ALLSRC)
+	aspell --lang="$(LANG)" create master "./$@" < $^
 
 ion-rfc.pdf: $(OUTPUT)
 	    cat $(OUTPUT) | \

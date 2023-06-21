@@ -11,8 +11,8 @@
 .\"   --> Header/footers: Set short title, author(s), and dates:
 .ds CH Ion                               \" <Short title>
 .ds LF Jonker, Goo, Hohle                \" <Authors>
-.ds RH June 22, 2017                     \" <Submission date>
-.ds CF Expires December 2017             \" <Expiration date>
+.ds RH June 21, 2023                     \" <Submission date>
+.ds CF Expires December 2023             \" <Expiration date>
 .hy 0
 .ad l
 .nf
@@ -20,7 +20,7 @@
 Internet Draft                                                  J. Hohle
 <ion-rfc.txt>                                                 RFC Editor
 Category: Informational                                          USC ISI
-Expires December 2017                                      June 22, 2017
+Expires December 2023                                      June 21, 2023
 
 .ce
 The Amazon Ion Specification
@@ -52,12 +52,12 @@ http://www.ietf.org/ietf/1id-abstracts.txt.
 The list of Internet-Draft Shadow Directories can be accessed at
 http://www.ietf.org/shadow.html.
 
-This Internet-Draft will expire on December 22, 2017.
+This Internet-Draft will expire on December 23, 2023.
 
 .ti 0
 Copyright Notice
 
-Copyright (c) 2013-2017 Amazon.com, Inc. and the persons identified as
+Copyright (c) 2013-2023 Amazon.com, Inc. and the persons identified as
 the document authors.  All rights reserved.
 
 This document is subject to BCP 78 and the IETF Trust's Legal
@@ -66,4 +66,3 @@ Provisions Relating to IETF Documents
 publication of this document.  Please review these documents
 carefully, as they describe your rights and restrictions with respect
 to this document.
-
