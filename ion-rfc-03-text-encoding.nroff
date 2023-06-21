@@ -512,9 +512,8 @@ are separated by commas.
 3.13. S-Expressions
 
 In the text format, S-expressions are bounded by parentheses.
-S-expressions also allow unquoted operator symbols (in addition to the
-unquoted identifier symbols allowed everywhere), so commas are
-interpreted as values rather than element separators.
+S-expressions also allow unquoted operator symbols in addition to the
+unquoted identifier symbols allowed everywhere.
 
 .nf
    null.sexp         // A null S-expression value
