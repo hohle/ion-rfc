@@ -1,8 +1,11 @@
 # output
-ion-rfc.txt
-ion-rfc.pdf
+rfc-ion.txt
+rfc-ion.pdf
 
 # intermediate files
 toc.input
 aspell-dict
 *.sc
+
+# os
+.DS_Store

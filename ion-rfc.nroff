@@ -23,9 +23,10 @@ Category: Informational                                          USC ISI
 Expires December 2023                                      June 21, 2023
 
 .ce
-The Amazon Ion Specification
+The Ion Data Interchange Format Specification for Use Within
+Applications, Over the Wire, and At Rest
 .ce
-<ion-rfc.txt>
+<rfc-ion.txt>
 
 .in 3              \"  Basic indent for text is 3 spaces
 .ti 0              \"  "Temporary indent" for next line: 0 spaces

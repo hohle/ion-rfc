@@ -546,7 +546,9 @@ changing semantics. However, if symbols become undefined then some
 extant data may become unreadable when an exact-match import cannot
 be found.
 
-The use of symbol tables that violate these restriction will lead to undefined and potentially incorrect interpretation of Ion data. Therefore implementations should enforce these restrictions at appropriate points.
+The use of symbol tables that violate these restriction will lead to
+undefined and potentially incorrect interpretation of Ion data. Therefore
+implementations should enforce these restrictions at appropriate points.
 
 Version N+1 of a table MAY be the same as version N.
 

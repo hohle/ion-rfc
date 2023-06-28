@@ -41,7 +41,7 @@ SPELL_OUTPUT = \
 	  ion-rfc-appendix.sc \
 	  ion-rfc-references.sc
 
-OUTPUT = ion-rfc.txt
+OUTPUT = rfc-ion.txt
 TOC = toc.input
 
 #
@@ -105,7 +105,7 @@ $(OUTPUT_DICT): $(DICT)
 
 	aspell --lang="$(LANG)" create master "./$@" < $^
 
-ion-rfc.pdf: $(OUTPUT)
+rfc-ion.pdf: $(OUTPUT)
 	    cat $(OUTPUT) | \
 		awk ' \
 				{ gsub(/\r/, ""); } \
@@ -130,7 +130,7 @@ ion-rfc.pdf: $(OUTPUT)
 		enscript --margins 76::76: -B -q -p - | \
 		ps2pdf - $@
 
-pdf: ion-rfc.pdf
+pdf: rfc-ion.pdf
 
 clean:
 	$(call print_target)
@@ -139,4 +139,4 @@ clean:
 	rm -f $(OUTPUT)
 	rm -f $(OUTPUT_DICT)
 	rm -f $(SPELL_OUTPUT)
-	rm -f ion-rfc.pdf
+	rm -f rfc-ion.pdf

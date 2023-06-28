@@ -140,7 +140,8 @@ thus the following text forms all map to the same binary64 value:
    // the most human-friendly representation
    1.2e0
    
-   // the exact textual representation in base-10 for the binary64 value 1.2e0 represents
+   // the exact textual representation in base-10 for the binary64 value
+   // 1.2e0 represents
    1.1999999999999999555910790149937383830547332763671875e0
    
    // a shortened, irrational version, but still the same value
@@ -200,7 +201,7 @@ value are not followed--the rules for
 .ti 6
 o infinity - rule is not applicable for Ion Decimals
 
-.tl 6
+.ti 6
 o nan - rule is not applicable for Ion Decimals
 
 .in 3
