@@ -2,10 +2,12 @@
 .ti 0
 3. Ion Text Encoding
 
-The ion text encoding is a value stream which must be a valid sequence
-of UTF-8 code points. It shares many similarities to JSON, and in fact, is
-a proper superset of JSON. Ion extends JSON with additional datatypes,
-syntax, containers, and annotations.
+The Ion text encoding is easily human readable and writable. It is a
+superset of JSON with additional types, annotations, and C-style line
+comments.
+
+Ion text encoding is a value stream which must be a valid sequence
+of Unicode code points encoded as UTF-8.
 
 .tm _  3.1. Nulls  .................................................... \n%
 .ti 0
@@ -41,9 +43,6 @@ same characters as a symbol, they must be enclosed in single-quotes:
    'null'      // The type is symbol
    null.list   // The type is list
    'null.int'  // The type is symbol
-
-(As a historical aside, the null type exists primarily for compatibility
-with JSON, which has only the untyped null value.)
 
 
 .tm _  3.2. Booleans .................................................. \n%
@@ -299,14 +298,14 @@ Unicode Code Point    Ion Escape    Meaning
 \&U+0008                \\b            backspace BS
 \&U+0009                \\t            horizontal tab HT
 \&U+000A                \\n            linefeed LF
+\&U+000B                \\v            vertical tab VT
 \&U+000C                \\f            form feed FF
 \&U+000D                \\r            carriage return CR
-\&U+000B                \\v            vertical tab VT
 \&U+0022                \\"            double quote
 \&U+0027                \\'            single quote
+\&U+002F                \\/            forward slash
 \&U+003F                \\?            question mark
 \&U+005C                \\\\            backslash
-\&U+002F                \\/            forward slash
 \&nothing               \\NL           escaped NL expands to nothing
 \&U+00HH                \\xHH          2-digit hexadecimal Unicode
                                     code point

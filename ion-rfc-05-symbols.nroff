@@ -97,13 +97,14 @@ to this specification.
 Symbol tables only (meaningfully) occur at the top level of a data
 stream or datagram. An Ion data stream is structured as follows:
 
-An initial Ion Version Marker is required in binary data, and optional
-(but highly recommended) in text. All Ion text implicitly starts with
-$ion_1_0 when not explicitly provided. Every (top-level) IVM switches
-the parser to the indicated Ion version and sets the current symbol
-table to the indicated Ion system symbol table.
-
 .in 9
+.ti 6
+o An initial Ion Version Marker is required in binary data, and optional
+  (but highly recommended) in text. All Ion text implicitly starts with
+  $ion_1_0 when not explicitly provided. Every (top-level) IVM switches
+  the parser to the indicated Ion version and sets the current symbol
+  table to the indicated Ion system symbol table.
+
 .ti 6
 o Every top-level value (and all the hierarchical data within it) is
   interpreted with respect to the current symbol table at the point
@@ -115,12 +116,11 @@ o Every top-level local symbol table becomes the current symbol table
   extended by the implementation during processing of the rest of
   the stream.
 
-.ti 6
-o Certain top-level values such as IVMs and local symbol tables are
-  referred to as system values; all other values are referred to as user
-  values. An Ion implementation may give applications the ability to
-  "skip over" the system values, since they are generally irrelevant to
-  the semantics of the user data.
+Certain top-level values such as IVMs and local symbol tables are
+referred to as system values; all other values are referred to as user
+values. An Ion implementation may give applications the ability to
+"skip over" the system values, since they are generally irrelevant to
+the semantics of the user data.
 
 .in 3
 
